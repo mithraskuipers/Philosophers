@@ -6,9 +6,13 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/03 17:37:34 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/06/03 17:38:13 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/06/03 17:42:03 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "philo.sh"
+# include "philo.h"
 
+int	main(void)
+{
+	return (0);
+}
