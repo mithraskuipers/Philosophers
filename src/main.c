@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/03 17:37:34 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/06/03 17:48:05 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/06/03 17:48:23 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ typedef struct s_env
 int	main(void)
 {
 	t_env *env;
+
+	(void)env;
 
 	return (0);
 }
