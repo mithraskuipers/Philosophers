@@ -6,7 +6,7 @@
 #    By: mikuiper <mikuiper@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/06/03 17:36:28 by mikuiper      #+#    #+#                  #
-#    Updated: 2022/06/03 17:49:34 by mikuiper      ########   odam.nl          #
+#    Updated: 2022/06/05 22:34:41 by mikuiper      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,12 +14,14 @@ NAME		= philo
 CC			= gcc
 CFLAGS		= -Wall -Wextra -Werror
 CFLAGS_DBG	= -g3 -fsanitize=address
+LIBRARIES	= -lpthread
 
 INCS	=	-I./inc
 
 SRC_DIR		= ./src/
 
 SRCS		=	$(SRC_DIR)main.c \
+				$(SRC_DIR)libft.c \
 				$(SRC_DIR)tools.c
 
 OBJS		= $(SRCS:.c=.o)
@@ -31,7 +33,7 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@echo "\n$(GREEN)[philo] - Compiling $(NAME)..$(NOCOLOR)"
-	@$(CC) $(CFLAGS) $(INCS) -o $(NAME) $(OBJS)
+	@$(CC) $(CFLAGS) $(INCS) -o $(NAME) $(OBJS) $(LIBRARIES) 
 
 dbg: fclean all
 	@echo "\n$(GREEN)[philo] - Compiling $(NAME)..$(NOCOLOR)"
