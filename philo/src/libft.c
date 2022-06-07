@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/05 12:35:20 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/06/05 15:17:13 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/06/07 17:00:43 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ int	mk_atoi(char *s, int *nbr)
 	{
 		value = (value * 10) + (s[i] - '0');
 		if (value > INTMAX || value < INTMIN)
-			return (-1);
+			return (1);
 		i++;
 	}
 	*nbr = (int)value * sign;
