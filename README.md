@@ -1,5 +1,7 @@
 # Philosophers
 
+Status: [![mikuiper's 42 minitalk Score](https://badge42.vercel.app/api/v2/cl483ajsd008309l6suq9l256/project/2539864)](https://github.com/mithraskuipers)
+
 ## dining philosophers problem
 
 > In this project, you will learn the basics of threading a process. You will learn how to make threads. You will discover the mutex.
