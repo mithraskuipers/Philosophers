@@ -52,3 +52,68 @@ int main(int argc, char* argv[])
     return 0;
 }
 */
+
+
+// werkt!
+// void	init_philos(t_env *env)
+// {
+// 	int	i;
+
+// 	i = 0;
+// 	t_philo *philos;
+// 	philos = malloc(sizeof(t_philo) * (env->n_philos));
+// 	//protect
+// 	while(i < env->n_philos)
+// 	{
+// 		philos[i].nbr = i;
+// 		printf("%d\n", philos[i].nbr);
+// 		i++;
+// 	}
+// }
+
+/*
+// werkt, maar kut want 0 index werkt niet.
+// moet werken met dubbele pointers
+void	init_philos(t_env *env)
+{
+	int	i;
+	int j;
+
+	i = 1;
+	j = 0;
+	env->philos = malloc((sizeof(t_philo) * (env->n_philos)));
+	if (!env->philos)
+		exit(1); // rough
+	while(i <= env->n_philos)
+	{
+		env->philos[i].nbr = j;
+		printf("%d\n", env->philos[i].nbr);
+		i++;
+		j++;
+	}
+}
+*/
+
+// int	init_philos(t_env *env)
+// {
+// 	int	i;
+
+// 	env->philos = malloc(sizeof(t_philo) * env->n_philos);
+// 	//env->forks = malloc(sizeof(int) * env->n_philos);
+// 	//if (!env->philos || !env->forks)
+// 	//	return (ft_log(MALLOC_ERROR));
+// 	i = 0;
+// 	while (i < env->n_philos)
+// 	{
+// 		env->philos[i].nbr = 0;
+// 		//env->forks[i] = 0;
+// 		//env->philos[i].position = i;
+// 		//env->philos[i].l_fork = i;
+// 		//env->philos[i].r_fork = (i + 1) % env->amount;
+// 		//env->philos[i].meals = 0;
+// 		//env->philos[i].eating = 0;
+// 		//env->philos[i].env = env;
+// 		i++;
+// 	}
+// 	return (0);
+// }

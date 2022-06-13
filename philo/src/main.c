@@ -138,22 +138,7 @@ long	ft_time(void)
 	return (res);
 }
 
-void	mutex_maker(t_env *env)
-{
-	int				i;
-	pthread_mutex_t	*forks;
-
-	forks = malloc(sizeof(pthread_t) * env->n_philos);
-	i = 0;
-	while (i != env->n_philos)
-	{
-		pthread_mutex_init(&forks[i], NULL);
-		i++;
-	}
-	env->forks = forks;
-}
-
-long long	sec_to_millisec(int sec)
+size_t	sec_to_millisec(size_t sec)
 {
 	long long	millisec;
 	
@@ -161,7 +146,7 @@ long long	sec_to_millisec(int sec)
 	return (millisec);
 }
 
-long long	microsec_to_millisec(int microsec)
+size_t	microsec_to_millisec(size_t microsec)
 {
 	long long	millisec;
 	
@@ -169,25 +154,154 @@ long long	microsec_to_millisec(int microsec)
 	return (millisec);
 }
 
-void	create_mutex(t_env *env)
+void	create_mutexes(t_env *env)
 {
 	int	i;
 
 	i = 0;
 	env->forks = malloc(sizeof(pthread_mutex_t) * env->n_philos);
-	env->eating = malloc(sizeof(pthread_mutex_t) * env->n_philos);
+	//env->eating = malloc(sizeof(pthread_mutex_t) * env->n_philos);
 	while (i < env->n_philos)
 	{
-		pthread_mutex_init(env->forks[i], NULL);
-		pthread_mutex_init(env->eating[i], NULL);
-		
+		pthread_mutex_init(&env->forks[i], NULL);
+		//pthread_mutex_init(env->eating[i], NULL);
+		i++;
 	}
 }
 
+// void	*cycle(void *arg)
+// {
+// 	t_env *env; 
+// 	env = (t_env *)arg;
+// 	t_philo	*philo;
+
+// 	philo = (t_philo *)arg;
+// 	int i;
+// 	i = 0;
+// 	while (i < 5)
+// 	{
+// 		eating_process();
+// 		printf("%d", i);
+// 	}
+// }
+
+void	eating_process(t_env *env, t_philo *philo)
+{
+	int	left_fork;
+	int	right_fork;
+
+	left_fork = philo->nbr;
+	right_fork = ((philo->nbr + 1) % env->n_philos);
+	pthread_mutex_lock(&env->forks[left_fork]);
+	pthread_mutex_lock(&env->forks[right_fork]);
+	printf("hey\n");
+	pthread_mutex_unlock(&env->forks[left_fork]);
+	pthread_mutex_unlock(&env->forks[right_fork]);
+}
+
+void	thinking_process(void)
+{
+	;
+}
+
+void	sleeping_process(void)
+{
+	;
+}
+
+size_t	get_current_time(void)
+{
+	struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	return(sec_to_millisec(tv.tv_sec) + microsec_to_millisec(tv.tv_usec));
+}
+
+void	init_philos(t_env *env, t_philo **philos)
+{
+	int	i;
+
+	i = 0;
+	*philos = malloc(env->n_philos * sizeof(t_philo));
+	if (!philos)
+		msg_exit("Error: Memory allocation for philosophers failed.", 2, 1);
+	while(i < env->n_philos)
+	{
+		(*philos)[i].nbr = i;
+		(*philos)[i].eating = 0;
+		(*philos)[i].sleeping = 0;
+		(*philos)[i].thinking = 0;
+		(*philos)[i].env = env;
+		i++;
+	}
+}
+
+void	init_threads(t_env *env)
+{
+	env->threads = malloc(env->n_philos * sizeof(pthread_t));
+	if (!env->threads)
+		msg_exit("Error: Memory allocation for threads failed.", 2, 1);
+}
+
+void	init_time(t_env *env)
+{
+	env->dinner_time = get_current_time();
+}
+
+int	main(int argc, char **argv)
+{
+	t_env	*env;
+	env = ft_calloc(1, sizeof(t_env));
+	//env = malloc(1 * sizeof()) // crack
+	if (!env)
+		msg_exit("Error: env memory allocated failed.", 2, 1);
+	if ((argc != 5) && (argc != 6))
+		msg_exit("Error: Please enter the required number of arguments.", 2, 1);
+	check_input(argc, argv);
+	parse_input(argc, argv, env);
+	check_args(argc, env);
+	t_philo *philos;
+	init_philos(env, &philos);
+	create_mutexes(env);
+	init_threads(env);
+	init_time(env);
+
+	printf("%ld\n", philos[0].env->dinner_time);
+	
+	//printf("%d\n", philos[0].nbr);
+	// int	i;
+	// i = 0;
+	// while (i < env->n_philos)
+	// {
+	// 	pthread_create(env->threads[i], NULL, &cycle, env->philos[i]);
+	// 	eating_process(env, &env->philos[i]);
+	// 	i++;
+	// }
+
+	//init_philos(env, &philos);
+	//printf("%d\n", env->philos[0].nbr);
+}
+
+/*
+volgorde in project maken:
+environment struct bedenken/maken
+check_input()
+parse_input()
+check_args()
+philo struct bedenken/maken
+make_philos()
+time_keeping()
+sleeping()
+eating()
+thinking()
+death()
+create_mutexes()
+*/
+
+/* EXPERIMENT */
 // int	main(int argc, char **argv)
 // {
 // 	t_env *env;
-
 // 	env = ft_calloc(1, sizeof(env));
 // 	if (!env)
 // 		msg_exit("Error: env memory allocated failed.", 2, 1);
@@ -196,22 +310,18 @@ void	create_mutex(t_env *env)
 // 	check_input(argc, argv);
 // 	parse_input(argc, argv, env);
 // 	check_args(argc, env);
-	
-// 	//create_mutex(env);
-
+// 	//create_mutexes(env);
 // 	//long	tmp;
 // 	//tmp = ft_time();
 // 	//printf("%ld\n", tmp);
 // 	//sleep(1);
 // 	//tmp = ft_time();
 // 	//printf("%ld\n", tmp);
-// 	//t_tv	*current_time;
-// 	//gettimeofday(current_time, NULL);
-
+// 	//t_tv	*get_current_time;
+// 	//gettimeofday(get_current_time, NULL);
 // 	t_tmpstruct *tmp;
 // 	tmp = malloc(sizeof(t_tmpstruct) * 1);
 // 	tmp->a = '0';
-
 // 	pthread_mutex_t lock;
 // 	pthread_mutex_init(&lock, NULL);
 // 	pthread_t	thread_object1;
@@ -224,6 +334,5 @@ void	create_mutex(t_env *env)
 // 	// pthread_mutex_unlock(&lock);
 // 	// pthread_join(thread_object1, NULL);
 // 	sleep(10);
-
 // 	return (0);
 // }

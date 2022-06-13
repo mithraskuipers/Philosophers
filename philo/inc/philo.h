@@ -25,23 +25,28 @@
 
 typedef struct s_env
 {
-	int	n_philos;
-	int	time_die;
-	int	time_eat;
-	int	time_sleep;
-	int	n_eat;
+	int				n_philos;
+	int				time_die;
+	int				time_eat;
+	int				time_sleep;
+	int				n_eat;
+	size_t			dinner_time;
+	pthread_t		*threads;
 	pthread_mutex_t	*forks;
-	pthread_mutex_t	*eating;
+	//t_philo			*philos;
+	//pthread_mutex_t	*eating;
 }				t_env;
 
 typedef struct s_philo
 {
-	int	id;
-	int	eat;
-	int	sleep;
-	int	think;
-	
+	int		nbr;
+	size_t	mealtime;
+	int		eating;
+	int		sleeping;
+	int		thinking;
+	t_env	*env;
 }				t_philo;
+
 
 int		ft_strlen(char *s);
 void	ft_putstr_fd(char *s, int fd);
