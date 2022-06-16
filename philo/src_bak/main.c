@@ -140,23 +140,15 @@ long	ft_time(void)
 
 size_t	sec_to_millisec(size_t sec)
 {
-	size_t	millisec;
+	long long	millisec;
 	
 	millisec = sec * 1000;
 	return (millisec);
 }
 
-size_t	milli_to_micro(size_t millisec)
-{
-	size_t	microsec;
-	
-	microsec = millisec * 1000;
-	return (microsec);
-}
-
 size_t	microsec_to_millisec(size_t microsec)
 {
-	size_t	millisec;
+	long long	millisec;
 	
 	millisec = microsec / 1000;
 	return (millisec);
@@ -168,13 +160,11 @@ void	create_mutexes(t_env *env)
 
 	i = 0;
 	env->forks = malloc(sizeof(pthread_mutex_t) * env->n_philos);
-	env->eating = malloc(sizeof(pthread_mutex_t) * env->n_philos);
+	//env->eating = malloc(sizeof(pthread_mutex_t) * env->n_philos);
 	while (i < env->n_philos)
 	{
-		if (pthread_mutex_init(&env->forks[i], NULL) < 0)
-			msg_exit("Error: mutex initialization failed.", 2, 1);
-		if (pthread_mutex_init(&env->eating[i], NULL) < 0)
-			msg_exit("Error: mutex initialization failed.", 2, 1);
+		pthread_mutex_init(&env->forks[i], NULL);
+		//pthread_mutex_init(env->eating[i], NULL);
 		i++;
 	}
 }
@@ -186,6 +176,22 @@ size_t	get_current_time(void)
 
 	gettimeofday(&tv, NULL);
 	return(sec_to_millisec(tv.tv_sec) + microsec_to_millisec(tv.tv_usec));
+}
+
+
+
+void	eating_process(t_env *env, t_philo *philo)
+{
+	int	left_fork;
+	int	right_fork;
+
+	left_fork = philo->nbr;
+	right_fork = ((philo->nbr + 1) % env->n_philos);
+	pthread_mutex_lock(&env->forks[left_fork]);
+	pthread_mutex_lock(&env->forks[right_fork]);
+	printf("hey\n");
+	pthread_mutex_unlock(&env->forks[left_fork]);
+	pthread_mutex_unlock(&env->forks[right_fork]);
 }
 
 void	thinking_process(void)
@@ -229,50 +235,14 @@ void	init_time(t_env *env)
 	env->dinner_time = get_current_time();
 }
 
-void	sleeping(size_t duration)
-{
-	size_t	stopping_time;
-
-	stopping_time =  get_current_time() + duration;
-	while (get_current_time() < stopping_time)
-		usleep(milli_to_micro(duration));
-}
-
-void	eating_process(t_philo *philo)
-{
-	int	left_fork;
-	int	right_fork;
-
-	left_fork = philo->nbr;
-	right_fork = ((philo->nbr + 1) % philo->env->n_philos);
-	//(void)left_fork;
-	//(void)right_fork;
-	//printf("hey\n");
-	pthread_mutex_lock(&philo->env->forks[left_fork]);
-	pthread_mutex_lock(&philo->env->forks[right_fork]);
-	printf("philosopher [%d] has taken fork %d\n", philo->nbr, left_fork);
-	printf("philosopher [%d] has taken fork %d\n", philo->nbr, right_fork);
-	printf("philosopher [%d] started eating\n", philo->nbr);
-	sleeping(20);
-	pthread_mutex_unlock(&philo->env->forks[left_fork]);
-	pthread_mutex_unlock(&philo->env->forks[right_fork]);
-	printf("philosopher [%d] is done eating\n", philo->nbr);
-}
-
 void	*cycle(void *arg)
 {
 	//(void)arg;
-	t_philo *philo; 
-	philo = (t_philo *)arg;
-	//pthread_mutex_lock(&env->tmp);
-	//printf("%ld\n", get_current_time());
-	//printf("%d\n", philo->nbr);
-
-	eating_process(philo);
-	//thinking_process(philo);
-	//printf("philosopher [%d] is done eating\n", philo->nbr);
-
-	//pthread_mutex_unlock(&env->tmp);
+	t_env *env; 
+	env = (t_env *)arg;
+	pthread_mutex_lock(&env->tmp);
+	printf("%ld\n", get_current_time());
+	pthread_mutex_unlock(&env->tmp);
 	return NULL;
 }
 
@@ -296,7 +266,9 @@ int	main(int argc, char **argv)
 	pthread_mutex_init(&env->tmp, NULL);
 
 	//init_time(env);
+
 	//printf("%ld\n", philos[0].env->dinner_time);
+	
 	//printf("%d\n", philos[0].nbr);
 	
 	int	i;
@@ -304,6 +276,7 @@ int	main(int argc, char **argv)
 	while (i < env->n_philos)
 	{
 		pthread_create(&env->threads[i], NULL, &cycle, philos + i); //philos[i]
+		//eating_process(env, philos[i]);
 		i++;
 	}
 	sleep(1);

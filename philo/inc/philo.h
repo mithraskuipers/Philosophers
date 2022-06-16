@@ -33,8 +33,10 @@ typedef struct s_env
 	size_t			dinner_time;
 	pthread_t		*threads;
 	pthread_mutex_t	*forks;
+	pthread_mutex_t	tmp;
+
 	//t_philo			*philos;
-	//pthread_mutex_t	*eating;
+	pthread_mutex_t	*eating;
 }				t_env;
 
 typedef struct s_philo
@@ -45,6 +47,7 @@ typedef struct s_philo
 	int		sleeping;
 	int		thinking;
 	t_env	*env;
+	//pthread_mutex_t	tmp;
 }				t_philo;
 
 
