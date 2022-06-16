@@ -245,9 +245,6 @@ void	eating_process(t_philo *philo)
 
 	left_fork = philo->nbr;
 	right_fork = ((philo->nbr + 1) % philo->env->n_philos);
-	//(void)left_fork;
-	//(void)right_fork;
-	//printf("hey\n");
 	pthread_mutex_lock(&philo->env->forks[left_fork]);
 	pthread_mutex_lock(&philo->env->forks[right_fork]);
 	printf("philosopher [%d] has taken fork %d\n", philo->nbr, left_fork);
