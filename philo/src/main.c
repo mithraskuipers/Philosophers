@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/03 17:37:34 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/06/11 13:27:26 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/06/20 09:25:44 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -295,7 +295,7 @@ int	main(int argc, char **argv)
 	//init_time(env);
 	//printf("%ld\n", philos[0].env->dinner_time);
 	//printf("%d\n", philos[0].nbr);
-	
+
 	int	i;
 	i = 0;
 	while (i < env->n_philos)
@@ -304,6 +304,8 @@ int	main(int argc, char **argv)
 		i++;
 	}
 	sleep(1);
+
+	// script eindigt als iedereen 1x "done with eating"
 	//init_philos(env, &philos);
 	//printf("%d\n", env->philos[0].nbr);
 }
