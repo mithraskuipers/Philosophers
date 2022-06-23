@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/03 17:49:43 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/06/11 09:25:06 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/06/23 11:45:05 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 #define INTMAX 2147483647
 #define INTMIN -2147483648
 
+#define	TAKING_FORK 0
+
 typedef struct s_env
 {
 	int				n_philos;
@@ -30,7 +32,7 @@ typedef struct s_env
 	int				time_eat;
 	int				time_sleep;
 	int				n_eat;
-	size_t			dinner_time;
+	uint64_t		dinner_time;
 	pthread_t		*threads;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	tmp;
@@ -42,14 +44,13 @@ typedef struct s_env
 typedef struct s_philo
 {
 	int		nbr;
-	size_t	mealtime;
+	uint64_t	mealtime;
 	int		eating;
 	int		sleeping;
 	int		thinking;
 	t_env	*env;
 	//pthread_mutex_t	tmp;
 }				t_philo;
-
 
 int		ft_strlen(char *s);
 void	ft_putstr_fd(char *s, int fd);

@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/03 17:37:34 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/06/20 09:25:44 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/06/23 12:02:01 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,8 +133,8 @@ long	ft_time(void)
 
 	gettimeofday(&tv, NULL);
 	// tv gives seconds calculation since the epoch. tv_sec seconds, tv_usec microseconds (additional)
-	res = 1000 * (size_t)tv.tv_sec; // times 1000 for sec->millisec)
-	res = res + (size_t)tv.tv_usec / 1000;
+	res = 1000 * (uint64_t)tv.tv_sec; // times 1000 for sec->millisec)
+	res = res + (uint64_t)tv.tv_usec / 1000;
 	return (res);
 }
 
@@ -178,7 +178,6 @@ void	create_mutexes(t_env *env)
 		i++;
 	}
 }
-
 
 size_t	get_current_time(void)
 {
@@ -238,6 +237,16 @@ void	sleeping(size_t duration)
 		usleep(milli_to_micro(duration));
 }
 
+void	printer(t_philo *philo, int	task_code)
+{
+	if (task_code == 0)
+		
+		
+	//if (task_code == 1)
+	//if (task_code == 2)	
+}
+
+
 void	eating_process(t_philo *philo)
 {
 	int	left_fork;
@@ -250,7 +259,7 @@ void	eating_process(t_philo *philo)
 	printf("philosopher [%d] has taken fork %d\n", philo->nbr, left_fork);
 	printf("philosopher [%d] has taken fork %d\n", philo->nbr, right_fork);
 	printf("philosopher [%d] started eating\n", philo->nbr);
-	sleeping(20);
+	sleeping(1);
 	pthread_mutex_unlock(&philo->env->forks[left_fork]);
 	pthread_mutex_unlock(&philo->env->forks[right_fork]);
 	printf("philosopher [%d] is done eating\n", philo->nbr);
@@ -300,7 +309,7 @@ int	main(int argc, char **argv)
 	i = 0;
 	while (i < env->n_philos)
 	{
-		pthread_create(&env->threads[i], NULL, &cycle, philos + i); //philos[i]
+		pthread_create(&env->threads[i], NULL, &cycle, &philos[i]); // or pointer arithmetic philos + i
 		i++;
 	}
 	sleep(1);
@@ -309,58 +318,3 @@ int	main(int argc, char **argv)
 	//init_philos(env, &philos);
 	//printf("%d\n", env->philos[0].nbr);
 }
-
-/*
-volgorde in project maken:
-environment struct bedenken/maken
-check_input()
-parse_input()
-check_args()
-philo struct bedenken/maken
-make_philos()
-time_keeping()
-sleeping()
-eating()
-thinking()
-death()
-create_mutexes()
-*/
-
-/* EXPERIMENT */
-// int	main(int argc, char **argv)
-// {
-// 	t_env *env;
-// 	env = ft_calloc(1, sizeof(env));
-// 	if (!env)
-// 		msg_exit("Error: env memory allocated failed.", 2, 1);
-// 	if ((argc != 5) && (argc != 6))
-// 		msg_exit("Error: Please enter the required number of arguments.", 2, 1);
-// 	check_input(argc, argv);
-// 	parse_input(argc, argv, env);
-// 	check_args(argc, env);
-// 	//create_mutexes(env);
-// 	//long	tmp;
-// 	//tmp = ft_time();
-// 	//printf("%ld\n", tmp);
-// 	//sleep(1);
-// 	//tmp = ft_time();
-// 	//printf("%ld\n", tmp);
-// 	//t_tv	*get_current_time;
-// 	//gettimeofday(get_current_time, NULL);
-// 	t_tmpstruct *tmp;
-// 	tmp = malloc(sizeof(t_tmpstruct) * 1);
-// 	tmp->a = '0';
-// 	pthread_mutex_t lock;
-// 	pthread_mutex_init(&lock, NULL);
-// 	pthread_t	thread_object1;
-// 	//pthread_t	thread_object2;
-// 	//pthread_t	thread_object3;
-// 	pthread_create(&thread_object1, NULL, change_var1, tmp);
-// 	//pthread_create(&thread_object2, NULL, change_var2, tmp);
-// 	// /pthread_create(&thread_object3, NULL, read_var, tmp);
-// 	// pthread_mutex_lock(&lock);
-// 	// pthread_mutex_unlock(&lock);
-// 	// pthread_join(thread_object1, NULL);
-// 	sleep(10);
-// 	return (0);
-// }
