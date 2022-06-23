@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/03 17:49:43 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/06/23 11:45:05 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/06/23 16:56:58 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,11 @@
 #define INTMAX 2147483647
 #define INTMIN -2147483648
 
-#define	TAKING_FORK 0
+#define FORK 0
+#define EAT 1
+#define SLEEP 2
+#define THINK 3
+#define DIED 4
 
 typedef struct s_env
 {

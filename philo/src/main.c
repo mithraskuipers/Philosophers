@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/03 17:37:34 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/06/23 12:02:01 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/06/23 17:20:09 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,79 +84,67 @@ void	check_args(int argc, t_env *env)
 		msg_exit("Error: Wrong number of times everyone should eat.", 2, 1);
 }
 
-void printer(char n)
-{
-	int i;
+// void printer(char n)
+// {
+// 	int i;
 	
-	i = 0;
-	while (i < 4)
-	{
-		write(1, &n, 1);
-		write(1,"\n", 1);
-		i++;
-		sleep(1);
-	}
-}
+// 	i = 0;
+// 	while (i < 4)
+// 	{
+// 		write(1, &n, 1);
+// 		write(1,"\n", 1);
+// 		i++;
+// 		sleep(1);
+// 	}
+// }
 
-void player2(void)
-{
-	printer('2');
-}
+// void player2(void)
+// {
+// 	printer('2');
+// }
 
-void player3(void)
-{
-	printer('3');
-}
+// void player3(void)
+// {
+// 	printer('3');
+// }
 
-void *player1(void *arg)
-{
-	(void)arg;
-	printer('1');
-	return NULL;
-}
+// void *player1(void *arg)
+// {
+// 	(void)arg;
+// 	printer('1');
+// 	return NULL;
+// }
 
-void *player4(void *arg)
-{
-	(void)arg;
-	printer('4');
-	return NULL;
-}
+// void *player4(void *arg)
+// {
+// 	(void)arg;
+// 	printer('4');
+// 	return NULL;
+// }
 
 //#include <pthreads.h> // linux
 #include <pthread.h> //macos
 #include <sys/time.h>
 
-long	ft_time(void)
+uint64_t	sec_to_millisec(uint64_t sec)
 {
-	struct timeval	tv;
-	long			res;
-
-	gettimeofday(&tv, NULL);
-	// tv gives seconds calculation since the epoch. tv_sec seconds, tv_usec microseconds (additional)
-	res = 1000 * (uint64_t)tv.tv_sec; // times 1000 for sec->millisec)
-	res = res + (uint64_t)tv.tv_usec / 1000;
-	return (res);
-}
-
-size_t	sec_to_millisec(size_t sec)
-{
-	size_t	millisec;
+	uint64_t	millisec;
 	
 	millisec = sec * 1000;
 	return (millisec);
 }
 
-size_t	milli_to_micro(size_t millisec)
+uint64_t	milli_to_micro(uint64_t millisec)
 {
-	size_t	microsec;
+	uint64_t	microsec;
 	
 	microsec = millisec * 1000;
 	return (microsec);
 }
 
-size_t	microsec_to_millisec(size_t microsec)
+uint64_t	microsec_to_millisec(uint64_t microsec)
 {
-	size_t	millisec;
+	uint64_t	millisec;
 	
 	millisec = microsec / 1000;
 	return (millisec);
@@ -179,7 +167,19 @@ void	create_mutexes(t_env *env)
 	}
 }
 
-size_t	get_current_time(void)
+// long	ft_time(void)
+// {
+// 	struct timeval	tv;
+// 	long			res;
+
+// 	gettimeofday(&tv, NULL);
+// 	// tv gives seconds calculation since the epoch. tv_sec seconds, tv_usec microseconds (additional)
+// 	res = 1000 * (uint64_t)tv.tv_sec; // times 1000 for sec->millisec)
+// 	res = res + (uint64_t)tv.tv_usec / 1000;
+// 	return (res);
+// }
+
+uint64_t	get_current_time(void)
 {
 	struct timeval	tv;
 
@@ -239,9 +239,10 @@ void	sleeping(size_t duration)
 
 void	printer(t_philo *philo, int	task_code)
 {
+	uint64_t	time;
+	time = get_current_time();
 	if (task_code == 0)
-		
-		
+		printf("%llu %d has taken a fork\n", time, philo->nbr);
 	//if (task_code == 1)
 	//if (task_code == 2)	
 }
@@ -255,14 +256,16 @@ void	eating_process(t_philo *philo)
 	left_fork = philo->nbr;
 	right_fork = ((philo->nbr + 1) % philo->env->n_philos);
 	pthread_mutex_lock(&philo->env->forks[left_fork]);
+	printer(philo, 0);
 	pthread_mutex_lock(&philo->env->forks[right_fork]);
-	printf("philosopher [%d] has taken fork %d\n", philo->nbr, left_fork);
-	printf("philosopher [%d] has taken fork %d\n", philo->nbr, right_fork);
-	printf("philosopher [%d] started eating\n", philo->nbr);
+	printer(philo, 0); // deze 2e call doet niets???
+	// printf("philosopher [%d] has taken fork %d\n", philo->nbr, left_fork);
+	// printf("philosopher [%d] has taken fork %d\n", philo->nbr, right_fork);
+	// printf("philosopher [%d] started eating\n", philo->nbr);
 	sleeping(1);
 	pthread_mutex_unlock(&philo->env->forks[left_fork]);
 	pthread_mutex_unlock(&philo->env->forks[right_fork]);
-	printf("philosopher [%d] is done eating\n", philo->nbr);
+	// printf("philosopher [%d] is done eating\n", philo->nbr);
 }
 
 void	*cycle(void *arg)
