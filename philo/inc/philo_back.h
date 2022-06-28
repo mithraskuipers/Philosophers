@@ -29,6 +29,17 @@
 #define THINK 3
 #define DIED 4
 
+typedef struct s_philo
+{
+	int		nbr;
+	u_int64_t	last_dinner;
+	int		eating;
+	int		sleeping;
+	int		thinking;
+	t_env	*env;
+	//pthread_mutex_t	tmp;
+}				t_philo;
+
 typedef struct s_env
 {
 	int				n_philos;
@@ -39,22 +50,11 @@ typedef struct s_env
 	u_int64_t		first_dinner;
 	pthread_t		*threads;
 	pthread_mutex_t	*forks;
-	pthread_mutex_t	*eating_mutex;
-	pthread_mutex_t *death_mutex;
+	//pthread_mutex_t	*tmp;
+	//t_philo			*philos;
+	//t_philo			*philos;
+	pthread_mutex_t	*eating;
 }				t_env;
-
-typedef struct s_philo
-{
-	int		nbr;
-	u_int64_t	last_dinner;
-	int		eating;
-	int		sleeping;
-	int		thinking;
-	int		eat_counter;
-	int		fork_left;
-	int		fork_right;
-	t_env	*env;
-}				t_philo;
 
 int		ft_strlen(char *s);
 void	ft_putstr_fd(char *s, int fd);

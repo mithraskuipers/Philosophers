@@ -118,16 +118,13 @@ void	create_mutexes(t_env *env)
 
 	i = 0;
 	env->forks = malloc(sizeof(pthread_mutex_t) * env->n_philos);
-	//env->eating_mutex = malloc(sizeof(pthread_mutex_t) * env->n_philos);
-	env->eating_mutex = malloc(sizeof(pthread_mutex_t) * 1);
-	if (pthread_mutex_init(env->eating_mutex, NULL) < 0)
-		msg_exit("Error: mutex initialization failed.", 2, 1);
+	env->eating = malloc(sizeof(pthread_mutex_t) * env->n_philos);
 	while (i < env->n_philos)
 	{
 		if (pthread_mutex_init(&env->forks[i], NULL) < 0)
 			msg_exit("Error: mutex initialization failed.", 2, 1);
-		//if (pthread_mutex_init(&env->eating_mutex[i], NULL) < 0)
-		//	msg_exit("Error: mutex initialization failed.", 2, 1);
+		if (pthread_mutex_init(&env->eating[i], NULL) < 0)
+			msg_exit("Error: mutex initialization failed.", 2, 1);
 		i++;
 	}
 }
@@ -193,10 +190,7 @@ void	init_philos(t_env *env, t_philo **philos)
 		(*philos)[i].eating = 0;
 		(*philos)[i].sleeping = 0;
 		(*philos)[i].thinking = 0;
-		(*philos)[i].eat_counter = 0;
 		(*philos)[i].env = env;
-		(*philos)[i].fork_left = i;
-		(*philos)[i].fork_right = (((*philos)[i].nbr + 1) % (*philos)[i].env->n_philos);
 		i++;
 	}
 	return ;
@@ -216,78 +210,27 @@ void	init_time(t_env *env)
 	return ;
 }
 
-// void	pick_fork(t_philo *philo)
-// {
-// 	int	left_fork;
-// 	int	right_fork;
-
-// 	// left_fork = philo->nbr;
-// 	// right_fork = ((philo->nbr + 1) % philo->env->n_philos);
-// 	printer(philo, FORK);
-// 	if (philo->nbr % 2 == 0)
-// 		pthread_mutex_lock(&philo->env->forks[right_fork]);
-// 	else
-// 		pthread_mutex_lock(&philo->env->forks[left_fork]);
-// 	printer(philo, FORK);
-// }
-
-// void	pick_fork(t_philo *philo)
-// {
-// // 	int	left_fork;
-// // 	int	right_fork;
-// 	// left_fork = philo->nbr;
-// 	// right_fork = ((philo->nbr + 1) % philo->env->n_philos);
-// 	printer(philo, FORK);
-// 	if (philo->nbr % 2 == 0)
-// 		pthread_mutex_lock(&philo->env->forks[philo->fork_left]);
-// 	else
-// 		pthread_mutex_lock(&philo->env->forks[philo->fork_right]);
-// 	printer(philo, FORK);
-// }
-
-// void	return_fork(t_philo *philo)
-// {
-	// int	left_fork;
-	// int	right_fork;
-
-	// left_fork = philo->nbr;
-	// right_fork = ((philo->nbr + 1) % philo->env->n_philos);
-	// if (philo->nbr % 2 == 0)
-	// 	pthread_mutex_unlock(&philo->env->forks[left_fork]);
-	// else
-	// 	pthread_mutex_lock(&philo->env->forks[right_fork]);
-// }
-
-void	take_fork(t_philo *philo)
-{
-	if (philo->nbr % 2 == 0)
-	pthread_mutex_lock(&philo->env->forks[philo->fork_left]);
-	printer(philo, FORK);
-	pthread_mutex_lock(&philo->env->forks[philo->fork_right]);
-	printer(philo, FORK);
-}
-
 void	eating_process(t_philo *philo)
 {
-	//int	left_fork;
-	//int	right_fork;
+	int	left_fork;
+	int	right_fork;
 
-	//left_fork = philo->nbr;
-	//right_fork = ((philo->nbr + 1) % philo->env->n_philos);
-	//pthread_mutex_lock(&philo->env->forks[left_fork]);
-	//printer(philo, FORK);
-	//pthread_mutex_lock(&philo->env->forks[right_fork]);
-	//printer(philo, FORK);
-	pthread_mutex_lock(philo->env->eating_mutex);
+	left_fork = philo->nbr;
+	right_fork = ((philo->nbr + 1) % philo->env->n_philos);
+	pthread_mutex_lock(&philo->env->forks[left_fork]);
+	printer(philo, FORK);
+	pthread_mutex_lock(&philo->env->forks[right_fork]);
+	printer(philo, FORK);
 	printer(philo, EAT);
 	philo->last_dinner = get_current_time();
-	philo->eat_counter++;
-	pthread_mutex_unlock(philo->env->eating_mutex);
-	//usleep(milli_to_micro(philo->env->time_eat)); // waiting
-	//usleep(milli_to_micro(philo->env->time_eat)); // waiting
-	//pthread_mutex_unlock(&philo->env->forks[left_fork]);
-	//pthread_mutex_unlock(&philo->env->forks[right_fork]);
+
+	//usleep(milli_to_micro(philo->env->time_eat));
+
+	pthread_mutex_unlock(&philo->env->forks[left_fork]);
+	pthread_mutex_unlock(&philo->env->forks[right_fork]);	
+
 }
+
 
 void	sleeping_process(t_philo *philo)
 {
@@ -302,23 +245,13 @@ void	thinking_process(t_philo *philo)
 	return ;
 }
 
-
-
 void	*cycle(void *philo_object)
 {
-	t_philo *philo;
-
-	philo = (t_philo *)philo_object;
-	// if ((philo)->nbr % 2 == 0)
-	// 	usleep(10000);
 	while (1)
 	{
-		take_fork(philo);
+		t_philo *philo; 
+		philo = (t_philo *)philo_object;
 		eating_process(philo);
-		//return_fork(philo);
-		//printf("--->philo %d has eaten %d times\n", philo->nbr, philo->eat_counter);
-		//usleep(50);
-		//pthread_detach(philo->env->threads[philo->nbr]);
 		thinking_process(philo);
 		sleeping_process(philo);
 	}

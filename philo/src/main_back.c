@@ -118,16 +118,13 @@ void	create_mutexes(t_env *env)
 
 	i = 0;
 	env->forks = malloc(sizeof(pthread_mutex_t) * env->n_philos);
-	//env->eating_mutex = malloc(sizeof(pthread_mutex_t) * env->n_philos);
-	env->eating_mutex = malloc(sizeof(pthread_mutex_t) * 1);
-	if (pthread_mutex_init(env->eating_mutex, NULL) < 0)
-		msg_exit("Error: mutex initialization failed.", 2, 1);
+	env->eating = malloc(sizeof(pthread_mutex_t) * env->n_philos);
 	while (i < env->n_philos)
 	{
 		if (pthread_mutex_init(&env->forks[i], NULL) < 0)
 			msg_exit("Error: mutex initialization failed.", 2, 1);
-		//if (pthread_mutex_init(&env->eating_mutex[i], NULL) < 0)
-		//	msg_exit("Error: mutex initialization failed.", 2, 1);
+		if (pthread_mutex_init(&env->eating[i], NULL) < 0)
+			msg_exit("Error: mutex initialization failed.", 2, 1);
 		i++;
 	}
 }
@@ -169,34 +166,22 @@ void	printer(t_philo *philo, int	task_code)
 	return ;
 }
 
-void	sleeping(size_t duration)
-{
-	size_t	stopping_time;
 
-	stopping_time =  get_current_time() + duration;
-	while (get_current_time() < stopping_time)
-		usleep(milli_to_micro(duration));
-	return ;
-}
-
-void	init_philos(t_env *env, t_philo **philos)
+void	init_philos(t_env *env)
 {
 	int	i;
 
 	i = 0;
-	*philos = malloc(env->n_philos * sizeof(t_philo));
-	if (!philos)
+	env->philos = malloc(env->n_philos * sizeof(t_philo));
+	if (!env->philos)
 		msg_exit("Error: Memory allocation for philosophers failed.", 2, 1);
 	while(i < env->n_philos)
 	{
-		(*philos)[i].nbr = i;
-		(*philos)[i].eating = 0;
-		(*philos)[i].sleeping = 0;
-		(*philos)[i].thinking = 0;
-		(*philos)[i].eat_counter = 0;
-		(*philos)[i].env = env;
-		(*philos)[i].fork_left = i;
-		(*philos)[i].fork_right = (((*philos)[i].nbr + 1) % (*philos)[i].env->n_philos);
+		env->philos[i].nbr = i;
+		env->philos[i].eating = 0;
+		env->philos[i].sleeping = 0;
+		env->philos[i].thinking = 0;
+		//env->philos[i].env = env;
 		i++;
 	}
 	return ;
@@ -210,120 +195,88 @@ void	init_threads(t_env *env)
 	return ;
 }
 
-void	init_time(t_env *env)
-{
-	env->first_dinner = get_current_time();
-	return ;
-}
+// void	init_time(t_env *env)
+// {
+// 	env->first_dinner = get_current_time();
+// 	return ;
+// }
 
-// void	pick_fork(t_philo *philo)
+// void	eating_process(t_philo *philo)
 // {
 // 	int	left_fork;
 // 	int	right_fork;
 
-// 	// left_fork = philo->nbr;
-// 	// right_fork = ((philo->nbr + 1) % philo->env->n_philos);
+// 	left_fork = philo->nbr;
+// 	right_fork = ((philo->nbr + 1) % philo->env->n_philos);
+// 	pthread_mutex_lock(&philo->env->forks[left_fork]);
 // 	printer(philo, FORK);
-// 	if (philo->nbr % 2 == 0)
-// 		pthread_mutex_lock(&philo->env->forks[right_fork]);
-// 	else
-// 		pthread_mutex_lock(&philo->env->forks[left_fork]);
+// 	pthread_mutex_lock(&philo->env->forks[right_fork]);
 // 	printer(philo, FORK);
+// 	printer(philo, EAT);
+// 	philo->last_dinner = get_current_time();
+
+// 	//usleep(milli_to_micro(philo->env->time_eat));
+
+// 	pthread_mutex_unlock(&philo->env->forks[left_fork]);
+// 	pthread_mutex_unlock(&philo->env->forks[right_fork]);	
+
 // }
 
-// void	pick_fork(t_philo *philo)
-// {
-// // 	int	left_fork;
-// // 	int	right_fork;
-// 	// left_fork = philo->nbr;
-// 	// right_fork = ((philo->nbr + 1) % philo->env->n_philos);
-// 	printer(philo, FORK);
-// 	if (philo->nbr % 2 == 0)
-// 		pthread_mutex_lock(&philo->env->forks[philo->fork_left]);
-// 	else
-// 		pthread_mutex_lock(&philo->env->forks[philo->fork_right]);
-// 	printer(philo, FORK);
-// }
 
-// void	return_fork(t_philo *philo)
-// {
-	// int	left_fork;
-	// int	right_fork;
 
-	// left_fork = philo->nbr;
-	// right_fork = ((philo->nbr + 1) % philo->env->n_philos);
-	// if (philo->nbr % 2 == 0)
-	// 	pthread_mutex_unlock(&philo->env->forks[left_fork]);
-	// else
-	// 	pthread_mutex_lock(&philo->env->forks[right_fork]);
-// }
-
-void	take_fork(t_philo *philo)
+void	sleeping(size_t duration)
 {
-	if (philo->nbr % 2 == 0)
-	pthread_mutex_lock(&philo->env->forks[philo->fork_left]);
-	printer(philo, FORK);
-	pthread_mutex_lock(&philo->env->forks[philo->fork_right]);
-	printer(philo, FORK);
-}
+	size_t	stopping_time;
 
-void	eating_process(t_philo *philo)
-{
-	//int	left_fork;
-	//int	right_fork;
-
-	//left_fork = philo->nbr;
-	//right_fork = ((philo->nbr + 1) % philo->env->n_philos);
-	//pthread_mutex_lock(&philo->env->forks[left_fork]);
-	//printer(philo, FORK);
-	//pthread_mutex_lock(&philo->env->forks[right_fork]);
-	//printer(philo, FORK);
-	pthread_mutex_lock(philo->env->eating_mutex);
-	printer(philo, EAT);
-	philo->last_dinner = get_current_time();
-	philo->eat_counter++;
-	pthread_mutex_unlock(philo->env->eating_mutex);
-	//usleep(milli_to_micro(philo->env->time_eat)); // waiting
-	//usleep(milli_to_micro(philo->env->time_eat)); // waiting
-	//pthread_mutex_unlock(&philo->env->forks[left_fork]);
-	//pthread_mutex_unlock(&philo->env->forks[right_fork]);
+	stopping_time =  get_current_time() + duration;
+	while (get_current_time() < stopping_time)
+		usleep(milli_to_micro(duration));
+	return ;
 }
 
 void	sleeping_process(t_philo *philo)
 {
-	printer(philo, SLEEP);
+	//printer(philo, SLEEP);
 	sleeping(philo->env->time_sleep);
 	return ;
 }
 
-void	thinking_process(t_philo *philo)
+// void	thinking_process(t_philo *philo)
+// {
+// 	printer(philo, THINK);
+// 	return ;
+// }
+
+void	*cycle(void *arg)
 {
-	printer(philo, THINK);
-	return ;
-}
-
-
-
-void	*cycle(void *philo_object)
-{
-	t_philo *philo;
-
-	philo = (t_philo *)philo_object;
-	// if ((philo)->nbr % 2 == 0)
-	// 	usleep(10000);
 	while (1)
 	{
-		take_fork(philo);
-		eating_process(philo);
-		//return_fork(philo);
-		//printf("--->philo %d has eaten %d times\n", philo->nbr, philo->eat_counter);
-		//usleep(50);
-		//pthread_detach(philo->env->threads[philo->nbr]);
-		thinking_process(philo);
+		t_philo *philo; 
+		philo = (t_philo *)arg;
+		// eating_process(philo);
+		// thinking_process(philo);
 		sleeping_process(philo);
 	}
 	return NULL;
 }
+
+
+ int	create_threads(t_env *env)
+{
+	int	i;
+	int	fail;
+
+	i = 0;
+	while (i < env->n_philos)
+	{
+		fail = pthread_create(env->threads + i, NULL, &cycle, (env->philos) + i);
+		if (fail)
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
 
 int	main(int argc, char **argv)
 {
@@ -337,18 +290,20 @@ int	main(int argc, char **argv)
 	parse_input(argc, argv, env);
 	check_args(argc, env);
 
-	t_philo *philos;
-	init_philos(env, &philos);
+	init_philos(env);
 	create_mutexes(env);
 	init_threads(env);
+	if (!create_threads(env))
+		return (1);
 
-	int	i;
-	i = 0;
-	while (i < env->n_philos)
-	{
-		if (pthread_create(&env->threads[i], NULL, &cycle, &philos[i]) != 0) // philos + i
-			msg_exit("Error. Could not create threads.", 2, 1);
-		i++;
-	}
+
+	// int	i;
+	// i = 0;
+	// while (i < env->n_philos)
+	// {
+	// 	if (pthread_create(&env->threads[i], NULL, &cycle, &philos[i]) != 0) // philos + i
+	// 		msg_exit("Error. Could not create threads.", 2, 1);
+	// 	i++;
+	// }
 	printf("FINISHED!<----------------------------------\n");
 }
