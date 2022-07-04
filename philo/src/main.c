@@ -6,20 +6,21 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/03 17:37:34 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/06/23 17:20:09 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/03 15:30:06 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-/*
-https://github.com/lavrenovamaria/42-philosophers
-https://github-com.translate.goog/iciamyplant/Philosophers?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=nl&_x_tr_pto=wapp
-*/
-
 #include "philo.h"
-
-
 #include <pthread.h>
 #include <sys/time.h>
+
+/*
+1: n philos
+2: time it can without food and dies (ms)
+3: time it takes to eat (ms)
+4: time it takes to sleep (ms)
+5: n times must eat
+*/
 
 int	ft_isdigit(int c)
 {
@@ -88,31 +89,7 @@ void	check_args(int argc, t_env *env)
 		msg_exit("Error: Wrong number of times everyone should eat.", 2, 1);
 }
 
-u_int64_t	sec_to_millisec(u_int64_t sec)
-{
-	u_int64_t	millisec;
-	
-	millisec = sec * 1000;
-	return (millisec);
-}
-
-u_int64_t	milli_to_micro(u_int64_t millisec)
-{
-	u_int64_t	microsec;
-	
-	microsec = millisec * 1000;
-	return (microsec);
-}
-
-u_int64_t	microsec_to_millisec(u_int64_t microsec)
-{
-	u_int64_t	millisec;
-	
-	millisec = microsec / 1000;
-	return (millisec);
-}
-
-void	create_mutexes(t_env *env)
+int	create_mutexes(t_env *env)
 {
 	int	i;
 
@@ -120,73 +97,52 @@ void	create_mutexes(t_env *env)
 	env->forks = malloc(sizeof(pthread_mutex_t) * env->n_philos);
 	//env->eating_mutex = malloc(sizeof(pthread_mutex_t) * env->n_philos);
 	env->eating_mutex = malloc(sizeof(pthread_mutex_t) * 1);
-	if (pthread_mutex_init(env->eating_mutex, NULL) < 0)
-		msg_exit("Error: mutex initialization failed.", 2, 1);
+	if (pthread_mutex_init(env->eating_mutex, NULL) == -1)
+		return (-1);
+	//msg_exit("Error: mutex initialization failed.", 2, 1);
 	while (i < env->n_philos)
 	{
-		if (pthread_mutex_init(&env->forks[i], NULL) < 0)
-			msg_exit("Error: mutex initialization failed.", 2, 1);
+		if (pthread_mutex_init(&env->forks[i], NULL) == -1)
+			return (-1);
+		//msg_exit("Error: mutex initialization failed.", 2, 1);
 		//if (pthread_mutex_init(&env->eating_mutex[i], NULL) < 0)
 		//	msg_exit("Error: mutex initialization failed.", 2, 1);
 		i++;
 	}
+	return (0);
 }
 
-// long	ft_time(void)
+// int	init_philos(t_env *env, t_philo **philos)
 // {
-// 	struct timeval	tv;
-// 	long			res;
+// 	int	i;
 
-// 	gettimeofday(&tv, NULL);
-// 	// tv gives seconds calculation since the epoch. tv_sec seconds, tv_usec microseconds (additional)
-// 	res = 1000 * (u_int64_t)tv.tv_sec; // times 1000 for sec->millisec)
-// 	res = res + (u_int64_t)tv.tv_usec / 1000;
-// 	return (res);
+// 	i = 0;
+// 	*philos = malloc(env->n_philos * sizeof(t_philo));
+// 	if (!philos)
+// 		return (-1);
+// 	while(i < env->n_philos)
+// 	{
+// 		(*philos)[i].nbr = i;
+// 		(*philos)[i].eating = 0;
+// 		(*philos)[i].sleeping = 0;
+// 		(*philos)[i].thinking = 0;
+// 		(*philos)[i].eat_counter = 0;
+// 		(*philos)[i].env = env;
+// 		(*philos)[i].fork_left = i;
+// 		(*philos)[i].fork_right = (((*philos)[i].nbr + 1) % (*philos)[i].env->n_philos);
+// 		i++;
+// 	}
+// 	return (0);
 // }
 
-u_int64_t	get_current_time(void)
-{
-	struct timeval	tv;
-
-	gettimeofday(&tv, NULL);
-	return(sec_to_millisec(tv.tv_sec) + microsec_to_millisec(tv.tv_usec));
-}
-
-void	printer(t_philo *philo, int	task_code)
-{
-	u_int64_t	time;
-	time = get_current_time();
-	if (task_code == 0)
-		printf("%lu %d has taken a fork\n", time, philo->nbr);
-	else if (task_code == 1)
-		printf("%lu %d is eating\n", time, philo->nbr);
-	else if (task_code == 2)
-		printf("%lu %d is sleeping\n", time, philo->nbr);
-	else if (task_code == 3)
-		printf("%lu %d is thinking\n", time, philo->nbr);
-	else if (task_code == 4)
-		printf("%lu %d died\n", time, philo->nbr);
-	return ;
-}
-
-void	sleeping(size_t duration)
-{
-	size_t	stopping_time;
-
-	stopping_time =  get_current_time() + duration;
-	while (get_current_time() < stopping_time)
-		usleep(milli_to_micro(duration));
-	return ;
-}
-
-void	init_philos(t_env *env, t_philo **philos)
+int	init_philos(t_env *env, t_philo **philos)
 {
 	int	i;
 
 	i = 0;
 	*philos = malloc(env->n_philos * sizeof(t_philo));
 	if (!philos)
-		msg_exit("Error: Memory allocation for philosophers failed.", 2, 1);
+		return (-1);
 	while(i < env->n_philos)
 	{
 		(*philos)[i].nbr = i;
@@ -197,132 +153,188 @@ void	init_philos(t_env *env, t_philo **philos)
 		(*philos)[i].env = env;
 		(*philos)[i].fork_left = i;
 		(*philos)[i].fork_right = (((*philos)[i].nbr + 1) % (*philos)[i].env->n_philos);
+		(*philos)[i].last_dinner = get_current_time();
 		i++;
 	}
-	return ;
+	return (0);
 }
 
-void	init_threads(t_env *env)
+int	init_threads(t_env *env)
 {
 	env->threads = malloc(env->n_philos * sizeof(pthread_t));
 	if (!env->threads)
-		msg_exit("Error: Memory allocation for threads failed.", 2, 1);
-	return ;
+		return (-1);
+	env->death_check = malloc(sizeof(pthread_t) * 1);
+	if (!env->death_check)
+		return (-1);
+	return (0);
 }
 
-void	init_time(t_env *env)
+void	printer(t_philo *philo, int	task_code)
 {
-	env->first_dinner = get_current_time();
+	u_int64_t	time_cur;
+	u_int64_t	time;
+	time_cur = get_current_time();
+	time = time_cur - philo->env->first_dinner;
+	time = time_cur;
+
+	pthread_mutex_lock(&philo->env->print_mutex);
+	printf("\n");
+	if (task_code == 0)
+		printf("%lu %d has taken a fork\n", time, philo->nbr + 1);
+	else if (task_code == 1)
+		printf("%lu %d is eating\n", time, philo->nbr + 1);
+	else if (task_code == 2)
+		printf("%lu %d is sleeping\n", time, philo->nbr + 1);
+	else if (task_code == 3)
+		printf("%lu %d is thinking\n", time, philo->nbr + 1);
+	else if (task_code == 4)
+		printf("%lu %d died", time, philo->nbr + 1);
+	pthread_mutex_unlock(&philo->env->print_mutex);
 	return ;
 }
 
-// void	pick_fork(t_philo *philo)
-// {
-// 	int	left_fork;
-// 	int	right_fork;
+int	is_dead(t_philo *philo)
+{
+	u_int64_t	current_time;
 
-// 	// left_fork = philo->nbr;
-// 	// right_fork = ((philo->nbr + 1) % philo->env->n_philos);
-// 	printer(philo, FORK);
-// 	if (philo->nbr % 2 == 0)
-// 		pthread_mutex_lock(&philo->env->forks[right_fork]);
-// 	else
-// 		pthread_mutex_lock(&philo->env->forks[left_fork]);
-// 	printer(philo, FORK);
-// }
-
-// void	pick_fork(t_philo *philo)
-// {
-// // 	int	left_fork;
-// // 	int	right_fork;
-// 	// left_fork = philo->nbr;
-// 	// right_fork = ((philo->nbr + 1) % philo->env->n_philos);
-// 	printer(philo, FORK);
-// 	if (philo->nbr % 2 == 0)
-// 		pthread_mutex_lock(&philo->env->forks[philo->fork_left]);
-// 	else
-// 		pthread_mutex_lock(&philo->env->forks[philo->fork_right]);
-// 	printer(philo, FORK);
-// }
-
-// void	return_fork(t_philo *philo)
-// {
-	// int	left_fork;
-	// int	right_fork;
-
-	// left_fork = philo->nbr;
-	// right_fork = ((philo->nbr + 1) % philo->env->n_philos);
-	// if (philo->nbr % 2 == 0)
-	// 	pthread_mutex_unlock(&philo->env->forks[left_fork]);
-	// else
-	// 	pthread_mutex_lock(&philo->env->forks[right_fork]);
-// }
+	current_time = get_current_time();
+	if ((current_time - philo->last_dinner) >= (u_int64_t)philo->env->time_die)
+	{
+		printer(philo, 4);
+		msg_exit("", 2, 1);
+	}
+	return (0);
+}
 
 void	take_fork(t_philo *philo)
 {
+	is_dead(philo);
 	if (philo->nbr % 2 == 0)
-	pthread_mutex_lock(&philo->env->forks[philo->fork_left]);
+	{
+		pthread_mutex_lock(&philo->env->forks[philo->fork_left]);
+		pthread_mutex_lock(&philo->env->forks[philo->fork_right]);
+	}
+	else
+	{
+		pthread_mutex_lock(&philo->env->forks[philo->fork_right]);
+		pthread_mutex_lock(&philo->env->forks[philo->fork_left]);
+	}
 	printer(philo, FORK);
-	pthread_mutex_lock(&philo->env->forks[philo->fork_right]);
 	printer(philo, FORK);
+}
+
+void	return_fork(t_philo *philo)
+{
+	is_dead(philo);
+	if (philo->nbr % 2 == 0)
+	{
+		pthread_mutex_unlock(&philo->env->forks[philo->fork_left]);
+		pthread_mutex_unlock(&philo->env->forks[philo->fork_right]);
+	}
+	else
+	{
+		pthread_mutex_unlock(&philo->env->forks[philo->fork_right]);
+		pthread_mutex_unlock(&philo->env->forks[philo->fork_left]);
+	}
 }
 
 void	eating_process(t_philo *philo)
 {
-	//int	left_fork;
-	//int	right_fork;
-
-	//left_fork = philo->nbr;
-	//right_fork = ((philo->nbr + 1) % philo->env->n_philos);
-	//pthread_mutex_lock(&philo->env->forks[left_fork]);
-	//printer(philo, FORK);
-	//pthread_mutex_lock(&philo->env->forks[right_fork]);
-	//printer(philo, FORK);
+	is_dead(philo);
 	pthread_mutex_lock(philo->env->eating_mutex);
 	printer(philo, EAT);
+	sleep_for_duration(philo->env->time_eat);
 	philo->last_dinner = get_current_time();
 	philo->eat_counter++;
 	pthread_mutex_unlock(philo->env->eating_mutex);
-	//usleep(milli_to_micro(philo->env->time_eat)); // waiting
-	//usleep(milli_to_micro(philo->env->time_eat)); // waiting
-	//pthread_mutex_unlock(&philo->env->forks[left_fork]);
-	//pthread_mutex_unlock(&philo->env->forks[right_fork]);
 }
 
 void	sleeping_process(t_philo *philo)
 {
+	is_dead(philo);
 	printer(philo, SLEEP);
-	sleeping(philo->env->time_sleep);
+	sleep_for_duration(philo->env->time_sleep);
 	return ;
 }
 
 void	thinking_process(t_philo *philo)
 {
+	is_dead(philo);
 	printer(philo, THINK);
+	usleep(1);
 	return ;
 }
-
-
 
 void	*cycle(void *philo_object)
 {
 	t_philo *philo;
 
 	philo = (t_philo *)philo_object;
-	// if ((philo)->nbr % 2 == 0)
-	// 	usleep(10000);
 	while (1)
 	{
 		take_fork(philo);
 		eating_process(philo);
-		//return_fork(philo);
-		//printf("--->philo %d has eaten %d times\n", philo->nbr, philo->eat_counter);
-		//usleep(50);
-		//pthread_detach(philo->env->threads[philo->nbr]);
-		thinking_process(philo);
+		return_fork(philo);
 		sleeping_process(philo);
+		thinking_process(philo);
 	}
-	return NULL;
+	return (NULL);
+}
+
+int	start_threads(t_env *env)
+{
+	int	i;
+	int	status;
+	i = 0;
+	while (i < env->n_philos)
+	{
+		status = pthread_create(&env->threads[i], NULL, &cycle, &env->philos[i]);
+		if (status != 0)
+			return (status); 
+		// if (pthread_create(&philos->env->threads[i], NULL, &cycle, &philos[i]) != 0) // philos + i
+		// 	msg_exit("Error. Could not create threads.", 2, 1);
+		i++;
+	}
+	// status = pthread_create(env->death_check, NULL, &death_checker, env);
+	// if (status != 0)
+	// 	return (status); 
+	return (0);
+}
+
+int	join_threads(t_env *env)
+{
+	int	philo_nbr;
+
+	philo_nbr = env->n_philos;
+	// if (philo_nbr == 1)
+	// {
+	// 	pthread_mutex_unlock(&env->forks[0]); // why 0
+	// }
+	while (philo_nbr)
+	{
+		philo_nbr--;
+		if (pthread_join(env->threads[philo_nbr], NULL) == -1)
+			return (-1);
+	}
+	return (0);
+}
+
+// int	clean_env(t_env *env)
+// {
+// 	;
+// }
+
+// int	clean_philos(t_philo *philos)
+// {
+// 	;
+// }
+
+void	init_env(t_env *env)
+{
+	env->someone_died = 0;
+	env->first_dinner = get_current_time();
+	return ;
 }
 
 int	main(int argc, char **argv)
@@ -336,19 +348,28 @@ int	main(int argc, char **argv)
 	check_input(argc, argv);
 	parse_input(argc, argv, env);
 	check_args(argc, env);
-
-	t_philo *philos;
-	init_philos(env, &philos);
-	create_mutexes(env);
-	init_threads(env);
-
-	int	i;
-	i = 0;
-	while (i < env->n_philos)
-	{
-		if (pthread_create(&env->threads[i], NULL, &cycle, &philos[i]) != 0) // philos + i
-			msg_exit("Error. Could not create threads.", 2, 1);
-		i++;
-	}
+	init_env(env);
+	if (init_philos(env, &env->philos) == -1)
+		msg_exit("Error: Memory allocation for philosophers failed.", 2, 1);
+	if (create_mutexes(env) == -1)
+		msg_exit("Error: mutex initialization failed.", 2, 1);
+	if (init_threads(env) == -1)
+		msg_exit("Error: Memory allocation for threads failed.", 2, 1);
+	if (start_threads(env) == -1)
+		msg_exit("Error. Could not create threads.", 2, 1);
+	if (join_threads(env) == -1)
+		msg_exit("Error. Could not join threads.", 2, 1);
 	printf("FINISHED!<----------------------------------\n");
 }
+
+/*
+Come to end when:
+	Someone died
+	When ate enough times (optional)
+*/
+
+/*
+TODO:
+MAAK DEATH CHECKER NIET EIGEN THREAD, TEVEEL SLOWDOWN
+BEDENK IETS ANDERS...
+*/

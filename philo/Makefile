@@ -6,7 +6,7 @@
 #    By: mikuiper <mikuiper@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/06/03 17:36:28 by mikuiper      #+#    #+#                  #
-#    Updated: 2022/06/05 22:34:41 by mikuiper      ########   odam.nl          #
+#    Updated: 2022/07/01 16:09:38 by mikuiper      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,6 +21,7 @@ INCS	=	-I./inc
 SRC_DIR		= ./src/
 
 SRCS		=	$(SRC_DIR)main.c \
+				$(SRC_DIR)time.c \
 				$(SRC_DIR)libft.c \
 				$(SRC_DIR)tools.c
 

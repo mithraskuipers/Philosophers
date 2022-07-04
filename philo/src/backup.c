@@ -285,3 +285,74 @@ int	main(int argc, char **argv)
 	}
 	printf("FINISHED!<----------------------------------\n");
 }
+
+
+
+
+// void	pick_fork(t_philo *philo)
+// {
+// 	int	left_fork;
+// 	int	right_fork;
+
+// 	// left_fork = philo->nbr;
+// 	// right_fork = ((philo->nbr + 1) % philo->env->n_philos);
+// 	printer(philo, FORK);
+// 	if (philo->nbr % 2 == 0)
+// 		pthread_mutex_lock(&philo->env->forks[right_fork]);
+// 	else
+// 		pthread_mutex_lock(&philo->env->forks[left_fork]);
+// 	printer(philo, FORK);
+// }
+
+// void	pick_fork(t_philo *philo)
+// {
+// // 	int	left_fork;
+// // 	int	right_fork;
+// 	// left_fork = philo->nbr;
+// 	// right_fork = ((philo->nbr + 1) % philo->env->n_philos);
+// 	printer(philo, FORK);
+// 	if (philo->nbr % 2 == 0)
+// 		pthread_mutex_lock(&philo->env->forks[philo->fork_left]);
+// 	else
+// 		pthread_mutex_lock(&philo->env->forks[philo->fork_right]);
+// 	printer(philo, FORK);
+// }
+
+// void	return_fork(t_philo *philo)
+// {
+	// int	left_fork;
+	// int	right_fork;
+
+	// left_fork = philo->nbr;
+	// right_fork = ((philo->nbr + 1) % philo->env->n_philos);
+	// if (philo->nbr % 2 == 0)
+	// 	pthread_mutex_unlock(&philo->env->forks[left_fork]);
+	// else
+	// 	pthread_mutex_lock(&philo->env->forks[right_fork]);
+// }
+
+// long	ft_time(void)
+// {
+// 	struct timeval	tv;
+// 	long			res;
+
+// 	gettimeofday(&tv, NULL);
+// 	// tv gives seconds calculation since the epoch. tv_sec seconds, tv_usec microseconds (additional)
+// 	res = 1000 * (u_int64_t)tv.tv_sec; // times 1000 for sec->millisec)
+// 	res = res + (u_int64_t)tv.tv_usec / 1000;
+// 	return (res);
+// }
+
+	//int	left_fork;
+	//int	right_fork;
+
+	//left_fork = philo->nbr;
+	//right_fork = ((philo->nbr + 1) % philo->env->n_philos);
+	//pthread_mutex_lock(&philo->env->forks[left_fork]);
+	//printer(philo, FORK);
+	//pthread_mutex_lock(&philo->env->forks[right_fork]);
+	//printer(philo, FORK);
+	//usleep(milli_to_micro(philo->env->time_eat)); // waiting
+	//usleep(milli_to_micro(philo->env->time_eat)); // waiting
+	//pthread_mutex_unlock(&philo->env->forks[left_fork]);
+	//pthread_mutex_unlock(&philo->env->forks[right_fork]);
