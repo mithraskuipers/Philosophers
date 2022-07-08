@@ -39,6 +39,7 @@ typedef struct s_philo
 	int		eat_counter;
 	int		fork_left;
 	int		fork_right;
+	int		died;
 	struct s_env	*env;
 }				t_philo;
 
@@ -50,9 +51,11 @@ typedef struct s_env
 	int				time_sleep;
 	int				n_eat;
 	int				someone_died;
+	int				dinner_done;
 	u_int64_t		first_dinner;
 	pthread_t		*threads;
-	pthread_t		*death_check;
+	pthread_t		*alive;
+	//pthread_t		*death_check;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	*eating_mutex;
 	//pthread_mutex_t	*death_mutex;

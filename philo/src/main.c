@@ -11,8 +11,6 @@
 /* ************************************************************************** */
 
 #include "philo.h"
-#include <pthread.h>
-#include <sys/time.h>
 
 /*
 1: n philos
@@ -150,6 +148,7 @@ int	init_philos(t_env *env, t_philo **philos)
 		(*philos)[i].sleeping = 0;
 		(*philos)[i].thinking = 0;
 		(*philos)[i].eat_counter = 0;
+		(*philos)[i].died = 0;
 		(*philos)[i].env = env;
 		(*philos)[i].fork_left = i;
 		(*philos)[i].fork_right = (((*philos)[i].nbr + 1) % (*philos)[i].env->n_philos);
@@ -159,14 +158,21 @@ int	init_philos(t_env *env, t_philo **philos)
 	return (0);
 }
 
+// TODO!!!!!!
+// PRINT FUNCTIE CHECK OF DOOD + MUTEX
+// IMPROVED USLEEP()
+
 int	init_threads(t_env *env)
 {
 	env->threads = malloc(env->n_philos * sizeof(pthread_t));
 	if (!env->threads)
 		return (-1);
-	env->death_check = malloc(sizeof(pthread_t) * 1);
-	if (!env->death_check)
+	env->alive = malloc(env->n_philos * sizeof(pthread_t));
+	if (!env->alive)
 		return (-1);
+	// env->death_check = malloc(sizeof(pthread_t) * 1);
+	// if (!env->death_check)
+	// 	return (-1);
 	return (0);
 }
 
@@ -181,15 +187,15 @@ void	printer(t_philo *philo, int	task_code)
 	pthread_mutex_lock(&philo->env->print_mutex);
 	printf("\n"); 
 	if (task_code == 0)
-		printf("%lu %d has taken a fork\n", time, philo->nbr + 1);
+		printf("%llu %d has taken a fork\n", time, philo->nbr + 1);
 	else if (task_code == 1)
-		printf("%lu %d is eating\n", time, philo->nbr + 1);
+		printf("%llu %d is eating\n", time, philo->nbr + 1);
 	else if (task_code == 2)
-		printf("%lu %d is sleeping\n", time, philo->nbr + 1);
+		printf("%llu %d is sleeping\n", time, philo->nbr + 1);
 	else if (task_code == 3)
-		printf("%lu %d is thinking\n", time, philo->nbr + 1);
+		printf("%llu %d is thinking\n", time, philo->nbr + 1);
 	else if (task_code == 4)
-		printf("----------->%lu %d died", time, philo->nbr + 1);
+		printf("----------->%llu %d died", time, philo->nbr + 1);
 	pthread_mutex_unlock(&philo->env->print_mutex);
 	return ;
 }
@@ -297,47 +303,65 @@ void	*cycle(void *philo_object)
 	return (NULL);
 }
 
-void	*philo_scanner(void *args)
-{
-	int		i;
-	t_env	*env;
+// void	*philo_scanner(void *args)
+// {
+// 	int		i;
+// 	t_env	*env;
 
-	i = 0;
-	env = (t_env *)args;
-	while (env->someone_died == 0)
-	{
-		i = 0;
-		while (i < env->n_philos)
-		{
-			if (is_dead(&env->philos[i]))
-				return (NULL);
-			i++;
-		}
-		// CHECK N TIMES EAT?
-	}
-	return (NULL);
+// 	i = 0;
+// 	env = (t_env *)args;
+// 	while (env->someone_died == 0)
+// 	{
+// 		i = 0;
+// 		while (i < env->n_philos)
+// 		{
+// 			if (is_dead(&env->philos[i]))
+// 				return (NULL);
+// 			i++;
+// 		}
+// 		// CHECK N TIMES EAT?
+// 	}
+// 	return (NULL);
+// }
+
+void	*alive_scanner(void *philo_object)
+{
+
 }
+
 
 int	start_threads(t_env *env)
 {
 	int			i;
-	int			status;
-	pthread_t	scanner;
+	int			thread_status;
+	pthread_t	alive_status;
 
 	i = 0;
 	while (i < env->n_philos)
 	{
-		status = pthread_create(&env->threads[i], NULL, &cycle, &env->philos[i]);
-		if (status != 0)
-			return (status); 
+		env->philos[i].last_dinner = get_current_time();
+		thread_status = pthread_create(&env->threads[i], NULL, cycle, &env->philos[i]); //&env->philos[i]
+		if (thread_status != 0)
+			return (thread_status); 
 		// if (pthread_create(&philos->env->threads[i], NULL, &cycle, &philos[i]) != 0) // philos + i
 		// 	msg_exit("Error. Could not create threads.", 2, 1);
 		i++;
+		usleep(100); // why this?
 	}
-	status = pthread_create(&scanner, NULL, philo_scanner, env);
-	if (status != 0)
-		return (status);
-		
+	i = 0;
+	while (i < env->n_philos)
+	{
+			alive_status = pthread_create(&env->alive[i], NULL, alive_scanner, &env->philos[i]);
+			if (alive_status != 0)
+				return (alive_status);
+			i++;
+			usleep(100);
+	}
+	// TODO philo_scanner() thread for every philosopher
+
+	// status = pthread_create(&scanner, NULL, philo_scanner, env);
+	// if (status != 0)
+	// 	return (status);
 	//pthread_create(&s_tid, NULL, ft_galina_monitor, (void *)args->all_philos);
 	// status = pthread_create(env->death_check, NULL, &death_checker, env);
 	return (0);
@@ -375,6 +399,7 @@ void	init_env(t_env *env)
 {
 	env->someone_died = 0;
 	env->first_dinner = get_current_time();
+	env->dinner_done = 0;
 	return ;
 }
 
