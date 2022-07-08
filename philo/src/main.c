@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/03 17:37:34 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/03 15:30:06 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/07 15:53:43 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,7 +179,7 @@ void	printer(t_philo *philo, int	task_code)
 	time = time_cur;
 
 	pthread_mutex_lock(&philo->env->print_mutex);
-	printf("\n");
+	printf("\n"); 
 	if (task_code == 0)
 		printf("%lu %d has taken a fork\n", time, philo->nbr + 1);
 	else if (task_code == 1)
@@ -189,7 +189,7 @@ void	printer(t_philo *philo, int	task_code)
 	else if (task_code == 3)
 		printf("%lu %d is thinking\n", time, philo->nbr + 1);
 	else if (task_code == 4)
-		printf("%lu %d died", time, philo->nbr + 1);
+		printf("----------->%lu %d died", time, philo->nbr + 1);
 	pthread_mutex_unlock(&philo->env->print_mutex);
 	return ;
 }
@@ -202,14 +202,17 @@ int	is_dead(t_philo *philo)
 	if ((current_time - philo->last_dinner) >= (u_int64_t)philo->env->time_die)
 	{
 		printer(philo, 4);
-		msg_exit("", 2, 1);
+		return (1);
+		//msg_exit("", 2, 1);
+		//return (1);
 	}
 	return (0);
 }
 
-void	take_fork(t_philo *philo)
+int	take_fork(t_philo *philo)
 {
-	is_dead(philo);
+	if (is_dead(philo))
+		return (1);
 	if (philo->nbr % 2 == 0)
 	{
 		pthread_mutex_lock(&philo->env->forks[philo->fork_left]);
@@ -222,11 +225,13 @@ void	take_fork(t_philo *philo)
 	}
 	printer(philo, FORK);
 	printer(philo, FORK);
+	return (0);
 }
 
-void	return_fork(t_philo *philo)
+int	return_fork(t_philo *philo)
 {
-	is_dead(philo);
+	if (is_dead(philo))
+		return (1);
 	if (philo->nbr % 2 == 0)
 	{
 		pthread_mutex_unlock(&philo->env->forks[philo->fork_left]);
@@ -237,33 +242,38 @@ void	return_fork(t_philo *philo)
 		pthread_mutex_unlock(&philo->env->forks[philo->fork_right]);
 		pthread_mutex_unlock(&philo->env->forks[philo->fork_left]);
 	}
+	return (0);
 }
 
-void	eating_process(t_philo *philo)
+int	eating_process(t_philo *philo)
 {
-	is_dead(philo);
+	if (is_dead(philo))
+		return (1);
 	pthread_mutex_lock(philo->env->eating_mutex);
 	printer(philo, EAT);
 	sleep_for_duration(philo->env->time_eat);
 	philo->last_dinner = get_current_time();
 	philo->eat_counter++;
 	pthread_mutex_unlock(philo->env->eating_mutex);
+	return (0);
 }
 
-void	sleeping_process(t_philo *philo)
+int	sleeping_process(t_philo *philo)
 {
-	is_dead(philo);
+	if (is_dead(philo))
+		return (1);
 	printer(philo, SLEEP);
 	sleep_for_duration(philo->env->time_sleep);
-	return ;
+	return (0);
 }
 
-void	thinking_process(t_philo *philo)
+int	thinking_process(t_philo *philo)
 {
-	is_dead(philo);
+	if (is_dead(philo))
+		return (1);
 	printer(philo, THINK);
 	usleep(1);
-	return ;
+	return (0);
 }
 
 void	*cycle(void *philo_object)
@@ -273,19 +283,47 @@ void	*cycle(void *philo_object)
 	philo = (t_philo *)philo_object;
 	while (1)
 	{
-		take_fork(philo);
-		eating_process(philo);
-		return_fork(philo);
-		sleeping_process(philo);
-		thinking_process(philo);
+		if (take_fork(philo))
+			return (NULL);
+		if (eating_process(philo))
+			return (NULL);
+		if (return_fork(philo))
+			return (NULL);
+		if (sleeping_process(philo))
+			return (NULL);
+		if (thinking_process(philo))
+			return (NULL);
+	}
+	return (NULL);
+}
+
+void	*philo_scanner(void *args)
+{
+	int		i;
+	t_env	*env;
+
+	i = 0;
+	env = (t_env *)args;
+	while (env->someone_died == 0)
+	{
+		i = 0;
+		while (i < env->n_philos)
+		{
+			if (is_dead(&env->philos[i]))
+				return (NULL);
+			i++;
+		}
+		// CHECK N TIMES EAT?
 	}
 	return (NULL);
 }
 
 int	start_threads(t_env *env)
 {
-	int	i;
-	int	status;
+	int			i;
+	int			status;
+	pthread_t	scanner;
+
 	i = 0;
 	while (i < env->n_philos)
 	{
@@ -296,9 +334,12 @@ int	start_threads(t_env *env)
 		// 	msg_exit("Error. Could not create threads.", 2, 1);
 		i++;
 	}
+	status = pthread_create(&scanner, NULL, philo_scanner, env);
+	if (status != 0)
+		return (status);
+		
+	//pthread_create(&s_tid, NULL, ft_galina_monitor, (void *)args->all_philos);
 	// status = pthread_create(env->death_check, NULL, &death_checker, env);
-	// if (status != 0)
-	// 	return (status); 
 	return (0);
 }
 
@@ -337,6 +378,22 @@ void	init_env(t_env *env)
 	return ;
 }
 
+// void	end_threads(t_env *env)
+// {
+// 	int	nbr_ph;
+
+// 	nbr_ph = env->n_philos;
+// 	if (nbr_ph == 1)
+// 	{
+// 		pthread_mutex_unlock(&env->forks[0]);
+// 	}
+// 	while (nbr_ph)
+// 	{
+// 		nbr_ph--;
+// 		pthread_join(env->threads[nbr_ph], NULL);
+// 	}
+// }
+
 int	main(int argc, char **argv)
 {
 	t_env	*env;
@@ -357,8 +414,9 @@ int	main(int argc, char **argv)
 		msg_exit("Error: Memory allocation for threads failed.", 2, 1);
 	if (start_threads(env) == -1)
 		msg_exit("Error. Could not create threads.", 2, 1);
-	if (join_threads(env) == -1)
-		msg_exit("Error. Could not join threads.", 2, 1);
+	//end_threads(env);
+	// if (join_threads(env) == -1)
+	// 	msg_exit("Error. Could not join threads.", 2, 1);
 	printf("FINISHED!<----------------------------------\n");
 }
 
@@ -372,4 +430,12 @@ Come to end when:
 TODO:
 MAAK DEATH CHECKER NIET EIGEN THREAD, TEVEEL SLOWDOWN
 BEDENK IETS ANDERS...
+*/
+
+/*
+1: n philos
+2: time it can without food and dies (ms)
+3: time it takes to eat (ms)
+4: time it takes to sleep (ms)
+5: n times must eat
 */
