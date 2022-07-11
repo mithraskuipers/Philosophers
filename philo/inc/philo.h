@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/03 17:49:43 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/01 17:00:24 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/09 21:43:20 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,8 @@ typedef struct s_philo
 	int		eat_counter;
 	int		fork_left;
 	int		fork_right;
-	int		died;
+	pthread_mutex_t *eating_mutex;
+	//int		died;
 	struct s_env	*env;
 }				t_philo;
 
@@ -53,12 +54,12 @@ typedef struct s_env
 	int				someone_died;
 	int				dinner_done;
 	u_int64_t		first_dinner;
-	pthread_t		*threads;
-	pthread_t		*alive;
+	pthread_t		*philo_threads;
+	pthread_t		*life_threads;
 	//pthread_t		*death_check;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	*eating_mutex;
-	//pthread_mutex_t	*death_mutex;
+	pthread_mutex_t	death_mutex;
 	pthread_mutex_t	print_mutex;
 	t_philo			*philos;
 }				t_env;

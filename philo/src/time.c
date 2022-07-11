@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/01 16:09:19 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/01 16:11:17 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/09 23:23:36 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,5 +52,7 @@ void	sleep_for_duration(int duration)
 
 	stopping_time = get_current_time() + duration;
 	while (get_current_time() < stopping_time)
-		usleep(1);
+	{
+		usleep(50);
+	}
 }
