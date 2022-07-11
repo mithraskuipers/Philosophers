@@ -32,7 +32,8 @@
 typedef struct s_philo
 {
 	int		nbr;
-	u_int64_t	last_dinner;
+	size_t	last_dinner;
+	size_t	time_to_die;
 	int		eating;
 	int		sleeping;
 	int		thinking;
@@ -40,7 +41,6 @@ typedef struct s_philo
 	int		fork_left;
 	int		fork_right;
 	pthread_mutex_t *eating_mutex;
-	//int		died;
 	struct s_env	*env;
 }				t_philo;
 
@@ -52,11 +52,10 @@ typedef struct s_env
 	int				time_sleep;
 	int				n_eat;
 	int				someone_died;
-	int				dinner_done;
+	int				continue_dinner;
 	u_int64_t		first_dinner;
 	pthread_t		*philo_threads;
 	pthread_t		*life_threads;
-	//pthread_t		*death_check;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	*eating_mutex;
 	pthread_mutex_t	death_mutex;
@@ -76,11 +75,10 @@ int		iswhitespace(int c);
 int		mk_atoi(char *s, int *nbr);
 
 /* time.c */
-u_int64_t	sec_to_millisec(u_int64_t sec);
-u_int64_t	milli_to_micro(u_int64_t millisec);
-u_int64_t	microsec_to_millisec(u_int64_t microsec);
-u_int64_t	get_current_time(void);
-void	sleep_for_duration(int duration);
-
+size_t	sec_to_millisec(size_t sec);
+size_t	milli_to_micro(size_t millisec);
+size_t	microsec_to_millisec(size_t microsec);
+size_t	get_current_time(void);
+void	sleep_for_duration(size_t duration);
 
 # endif

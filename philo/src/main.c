@@ -103,35 +103,10 @@ int	create_mutexes(t_env *env)
 		if (pthread_mutex_init(&env->forks[i], NULL) == -1)
 			return (-1);
 		//msg_exit("Error: mutex initialization failed.", 2, 1);
-		//if (pthread_mutex_init(&env->eating_mutex[i], NULL) < 0)
-		//	msg_exit("Error: mutex initialization failed.", 2, 1);
 		i++;
 	}
 	return (0);
 }
-
-// int	init_philos(t_env *env, t_philo **philos)
-// {
-// 	int	i;
-
-// 	i = 0;
-// 	*philos = malloc(env->n_philos * sizeof(t_philo));
-// 	if (!philos)
-// 		return (-1);
-// 	while(i < env->n_philos)
-// 	{
-// 		(*philos)[i].nbr = i;
-// 		(*philos)[i].eating = 0;
-// 		(*philos)[i].sleeping = 0;
-// 		(*philos)[i].thinking = 0;
-// 		(*philos)[i].eat_counter = 0;
-// 		(*philos)[i].env = env;
-// 		(*philos)[i].fork_left = i;
-// 		(*philos)[i].fork_right = (((*philos)[i].nbr + 1) % (*philos)[i].env->n_philos);
-// 		i++;
-// 	}
-// 	return (0);
-// }
 
 int	init_philos(t_env *env, t_philo **philos)
 {
@@ -153,6 +128,8 @@ int	init_philos(t_env *env, t_philo **philos)
 		(*philos)[i].fork_left = i;
 		(*philos)[i].fork_right = (((*philos)[i].nbr + 1) % (*philos)[i].env->n_philos);
 		(*philos)[i].last_dinner = get_current_time();
+		(*philos)[i].time_to_die = (*philos)[i].last_dinner + env->time_die;
+		(*philos)[i].eating_mutex = malloc(sizeof(pthread_mutex_t) * 1);
 		i++;
 	}
 	return (0);
@@ -178,59 +155,66 @@ int	init_threads(t_env *env)
 
 void	printer(t_philo *philo, int	task_code)
 {
-	u_int64_t	time_cur;
-	u_int64_t	time;
+	size_t	time_cur;
+	size_t	time;
 	time_cur = get_current_time();
 	time = time_cur - philo->env->first_dinner;
-	//time = time_cur;
+	time = time_cur;
 
 	pthread_mutex_lock(&philo->env->print_mutex);
 
-
-
-	u_int64_t	current_time;
-	current_time = get_current_time();
-	// printf("\n%d cur:      %ld", philo->nbr, current_time);
-	// printf("\n%d thres:    %ld", philo->nbr, philo->last_dinner + philo->env->time_die);
-	printf("\n");
-	printf("\n%d without:  %ld", philo->nbr, current_time - philo->last_dinner);
-	printf("\n%d left:     %ld", philo->nbr, philo->env->time_die - (current_time - philo->last_dinner));
-	printf("\n");
-
+	// size_t	current_time;
+	// current_time = get_current_time();
+	// printf("\n%d cur:      %zu", philo->nbr, current_time);
+	// printf("\n%d thres:    %zu", philo->nbr, philo->last_dinner + philo->env->time_die);
+	// printf("\n");
+	// printf("\n%d without:  %llu", philo->nbr, current_time - philo->last_dinner);
+	//printf("\n%d left:     %llu", philo->nbr, philo->env->time_die - (current_time - philo->last_dinner));
+	// printf("\n%d left:     %d", philo->nbr, philo->env->time_die);
+	
+	// printf("\n%d last dinner:      %zu", philo->nbr, philo->last_dinner);
+	// printf("\n%d survive until:    %zu", philo->nbr, philo->time_to_die);
+	// printf("\n%d current time:     %zu", philo->nbr, get_current_time());
+	// if (philo->time_to_die > get_current_time())
+	// 	printf("\n%d should die\n\n", philo->nbr);
+	// printf("\n");
 
 	if (!philo->env->someone_died)
 	{
 		if (task_code == 0)
-			printf("%lu %d has taken a fork\n", time, philo->nbr + 1);
+			printf("%zu %d has taken a fork\n", time, philo->nbr + 1);
 		else if (task_code == 1)
-			printf("%lu %d is eating\n", time, philo->nbr + 1);
+			printf("%zu %d is eating\n", time, philo->nbr + 1);
 		else if (task_code == 2)
-			printf("%lu %d is sleeping\n", time, philo->nbr + 1);
+			printf("%zu %d is sleeping\n", time, philo->nbr + 1);
 		else if (task_code == 3)
-			printf("%lu %d is thinking\n", time, philo->nbr + 1);
+			printf("%zu %d is thinking\n", time, philo->nbr + 1);
 		pthread_mutex_unlock(&philo->env->print_mutex);
 	}
-	else if (philo->env->someone_died && task_code == 4)
+	else if (philo->env->someone_died && task_code == 4) // dit is niet gegarandeerd de goede kill. Misschien sterven er 2 acher elkaar, en pakt die nu de 2e philo nbr
 	{
-		printf("%lu %d died\n", time, philo->nbr + 1);
+		printf("%zu %d died\n", time, philo->nbr + 1);
 		pthread_mutex_unlock(&philo->env->print_mutex);
 	}
 	pthread_mutex_unlock(&philo->env->print_mutex);
 	return ;
 }
 
+// int cleanup
+
 int	is_dead(t_philo *philo)
 {
-	u_int64_t	current_time;
+	size_t	current_time;
 
 	current_time = get_current_time();
 
 	pthread_mutex_lock(&philo->env->death_mutex);
-	//if ((current_time - philo->last_dinner) > (u_int64_t)philo->env->time_die) // misschien gaat hier iets niet goed
+	//if ((current_time - philo->last_dinner) > (size_t)philo->env->time_die) // misschien gaat hier iets niet goed
 	if (current_time > (philo->last_dinner + philo->env->time_die))
 	{
 		philo->env->someone_died = 1;
-		// exit(1);
+		//printf("\n%d DIED\n", philo->nbr);
+		//exit(1);
 		return (1);
 	}
 	pthread_mutex_unlock(&philo->env->death_mutex);
@@ -239,8 +223,6 @@ int	is_dead(t_philo *philo)
 
 int	take_fork(t_philo *philo)
 {
-	// if (is_dead(philo))
-	// 	return (1);
 	if (philo->nbr % 2 == 0)
 	{
 		pthread_mutex_lock(&philo->env->forks[philo->fork_left]);
@@ -258,8 +240,6 @@ int	take_fork(t_philo *philo)
 
 int	return_fork(t_philo *philo)
 {
-	// if (is_dead(philo))
-	// 	return (1);
 	if (philo->nbr % 2 == 0)
 	{
 		pthread_mutex_unlock(&philo->env->forks[philo->fork_left]);
@@ -275,22 +255,24 @@ int	return_fork(t_philo *philo)
 
 int	eating_process(t_philo *philo)
 {
-	// if (is_dead(philo))
-	// 	return (1);
+	//pthread_mutex_lock(philo->env->eating_mutex);
+	pthread_mutex_lock(philo->eating_mutex);
 	philo->last_dinner = get_current_time();
-	pthread_mutex_lock(philo->env->eating_mutex);
 	printer(philo, EAT);
+	philo->eating = 1;
 	sleep_for_duration(philo->env->time_eat);
-	philo->last_dinner = get_current_time();
+	philo->eating = 0;
 	philo->eat_counter++;
-	pthread_mutex_unlock(philo->env->eating_mutex);
+	philo->last_dinner = get_current_time();
+	philo->time_to_die = philo->last_dinner + philo->env->time_die;
+	printf("\n%d %lu\n\n", philo->nbr, philo->time_to_die);
+	//is_dead(philo);
+	pthread_mutex_unlock(philo->eating_mutex);
 	return (0);
 }
 
 int	sleeping_process(t_philo *philo)
 {
-	// if (is_dead(philo))
-	// 	return (1);
 	printer(philo, SLEEP);
 	sleep_for_duration(philo->env->time_sleep);
 	return (0);
@@ -298,8 +280,6 @@ int	sleeping_process(t_philo *philo)
 
 int	thinking_process(t_philo *philo)
 {
-	// if (is_dead(philo))
-	// 	return (1);
 	printer(philo, THINK);
 	//usleep(1);
 	//exit(1);
@@ -343,8 +323,9 @@ void	*philo_scanner(void *philo_object)
 			if (is_dead(philo))
 			{
 				printer(philo, 4);
-				exit(1);
-				//philo->env->someone_died = 1;
+				//exit(1);
+				philo->env->someone_died = 1;
+				philo->env->continue_dinner = 0;
 				return (NULL);
 			}
 			i++;
@@ -353,6 +334,30 @@ void	*philo_scanner(void *philo_object)
 	}
 	return (NULL);
 }
+
+// void	*philo_scanner(void *philo_object)
+// {
+// 	int i;
+// 	t_philo *philo;
+
+// 	i = 0;
+// 	philo = (t_philo *)philo_object;
+// 	while (philo->env->continue_dinner)
+// 	{
+// 		printf("%lu\n", get_current_time());
+// 		printf("%lu\n\n", philo->time_to_die);
+// 		if (!philo->eating && get_current_time() > philo->time_to_die)
+// 		{
+// 			//pthread_mutex_lock(philo->eating_mutex);
+// 			printer(philo, 4);
+// 			philo->env->continue_dinner = 0;
+// 			philo->env->someone_died = 1;
+// 			exit(1);
+// 			//pthread_mutex_unlock(philo->eating_mutex);
+// 		}	
+// 	}
+// 	return (NULL);
+// }
 
 // void	*alive_scanner(void *philo_object)
 // {
@@ -391,7 +396,7 @@ int	start_threads(t_env *env)
 {
 	int			i;
 	int			thread_status;
-	pthread_t	alive_status;
+	int			alive_status;
 
 	i = 0;
 	while (i < env->n_philos)
@@ -400,15 +405,12 @@ int	start_threads(t_env *env)
 		thread_status = pthread_create(&env->philo_threads[i], NULL, cycle, &env->philos[i]); //&env->philos[i]
 		if (thread_status != 0)
 			return (thread_status); 
-		// if (pthread_create(&philos->env->threads[i], NULL, &cycle, &philos[i]) != 0) // philos + i
-		// 	msg_exit("Error. Could not create threads.", 2, 1);
 		i++;
 		usleep(100); // why this?
 	}
 	i = 0;
 	while (i < env->n_philos)
 	{
-		env->philos[i].last_dinner = get_current_time();
 		alive_status = pthread_create(&env->life_threads[i], NULL, philo_scanner, &env->philos[i]); //&env->philos[i]
 		if (alive_status != 0)
 			return (alive_status); 
@@ -459,7 +461,7 @@ void	init_env(t_env *env)
 {
 	env->someone_died = 0;
 	env->first_dinner = get_current_time();
-	env->dinner_done = 0; 
+	env->continue_dinner = 1; 
 	return ;
 }
 
@@ -499,9 +501,11 @@ int	main(int argc, char **argv)
 		msg_exit("Error: Memory allocation for threads failed.", 2, 1);
 	if (start_threads(env) == -1)
 		msg_exit("Error. Could not create threads.", 2, 1);
+	while (env->continue_dinner)
+		continue;
 	// end_threads(env);
-	if (join_threads(env) == -1)
-		msg_exit("Error. Could not join threads.", 2, 1);
+	// if (join_threads(env) == -1)
+	// 	msg_exit("Error. Could not join threads.", 2, 1);
 	printf("FINISHED!\n");
 }
 
