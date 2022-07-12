@@ -6,7 +6,7 @@
 #    By: mikuiper <mikuiper@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/06/03 17:36:28 by mikuiper      #+#    #+#                  #
-#    Updated: 2022/07/01 16:09:38 by mikuiper      ########   odam.nl          #
+#    Updated: 2022/07/12 13:53:03 by mikuiper      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,12 @@ SRC_DIR		= ./src/
 SRCS		=	$(SRC_DIR)main.c \
 				$(SRC_DIR)time.c \
 				$(SRC_DIR)libft.c \
-				$(SRC_DIR)tools.c
+				$(SRC_DIR)init.c \
+				$(SRC_DIR)tools.c \
+				$(SRC_DIR)parse_input.c \
+				$(SRC_DIR)tasks.c \
+				$(SRC_DIR)printer.c \
+				$(SRC_DIR)routine.c
 
 OBJS		= $(SRCS:.c=.o)
 

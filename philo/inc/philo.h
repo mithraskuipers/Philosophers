@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/03 17:49:43 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/09 21:43:20 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/12 15:01:49 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,9 +76,25 @@ int		mk_atoi(char *s, int *nbr);
 
 /* time.c */
 size_t	sec_to_millisec(size_t sec);
-size_t	milli_to_micro(size_t millisec);
 size_t	microsec_to_millisec(size_t microsec);
 size_t	get_current_time(void);
 void	sleep_for_duration(size_t duration);
+
+/* init.c */
+int		init_philos(t_env *env, t_philo **philos);
+int		init_threads(t_env *env);
+
+/* printer.c */
+void	printer(t_philo *philo, int	task_code);
+
+/* tasks.c */
+int	eating_process(t_philo *philo);
+int	sleeping_process(t_philo *philo);
+int	thinking_process(t_philo *philo);
+int	take_fork(t_philo *philo);
+int	return_fork(t_philo *philo);
+
+/* routine.c */
+void	*routine(void *philo_object);
 
 # endif

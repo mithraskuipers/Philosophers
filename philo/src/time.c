@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/01 16:09:19 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/09 23:23:36 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/12 15:07:52 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,6 @@ size_t	sec_to_millisec(size_t sec)
 	
 	millisec = sec * 1000;
 	return (millisec);
-}
-
-size_t	milli_to_micro(size_t millisec)
-{
-	size_t	microsec;
-	
-	microsec = millisec * 1000;
-	return (microsec);
 }
 
 size_t	microsec_to_millisec(size_t microsec)
@@ -46,17 +38,6 @@ size_t	get_current_time(void)
 	return(current_time);
 }
 
-// void	sleep_for_duration(size_t duration)
-// {
-// 	size_t	stopping_time;
-
-// 	stopping_time = get_current_time() + duration;
-// 	while (get_current_time() < stopping_time)
-// 	{
-// 		usleep(50);
-// 	}
-// }
-
 void	sleep_for_duration(size_t duration)
 {
 	size_t	start_time;
@@ -66,5 +47,3 @@ void	sleep_for_duration(size_t duration)
 	while ((get_current_time() - start_time) < duration)
 		usleep(duration / 10);
 }
-
-// can not die during eating
