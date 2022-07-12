@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/12 08:52:17 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/12 10:59:29 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/12 19:59:43 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,8 @@ int	init_philos(t_env *env, t_philo **philos)
 	while(i < env->n_philos)
 	{
 		(*philos)[i].nbr = i;
-		(*philos)[i].eating = 0;
-		(*philos)[i].sleeping = 0;
-		(*philos)[i].thinking = 0;
 		(*philos)[i].eat_counter = 0;
+		(*philos)[i].done_eating = 0;
 		(*philos)[i].env = env;
 		(*philos)[i].fork_left = i;
 		(*philos)[i].fork_right = (((*philos)[i].nbr + 1) % \

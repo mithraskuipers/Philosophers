@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/03 17:49:43 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/12 15:01:49 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/12 19:59:34 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h> // for printf
+#include <stdio.h>
 
 # include <pthread.h>
 # include <sys/time.h>
@@ -34,12 +34,10 @@ typedef struct s_philo
 	int		nbr;
 	size_t	last_dinner;
 	size_t	time_to_die;
-	int		eating;
-	int		sleeping;
-	int		thinking;
 	int		eat_counter;
 	int		fork_left;
 	int		fork_right;
+	int		done_eating;
 	pthread_mutex_t *eating_mutex;
 	struct s_env	*env;
 }				t_philo;
@@ -57,7 +55,6 @@ typedef struct s_env
 	pthread_t		*philo_threads;
 	pthread_t		*life_threads;
 	pthread_mutex_t	*forks;
-	pthread_mutex_t	*eating_mutex;
 	pthread_mutex_t	death_mutex;
 	pthread_mutex_t	print_mutex;
 	t_philo			*philos;

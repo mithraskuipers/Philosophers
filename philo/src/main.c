@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/03 17:37:34 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/12 15:22:15 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/12 20:00:03 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 */
 
 /*
+TOEVOEGEN EAT COUNTER CHECK
 memory leaks
 variable clean up
 accurate sleep function
@@ -32,9 +33,6 @@ int	create_mutexes(t_env *env)
 
 	i = 0;
 	env->forks = calloc(sizeof(pthread_mutex_t), env->n_philos);
-	env->eating_mutex = calloc(1, sizeof(pthread_mutex_t));
-	if (pthread_mutex_init(env->eating_mutex, NULL) == -1)
-		return (-1);
 	//env->print_mutex = calloc(1, sizeof(pthread_mutex_t));
 	if (pthread_mutex_init(&env->print_mutex, NULL) == -1)
 		return (-1);
@@ -51,17 +49,10 @@ int	create_mutexes(t_env *env)
 
 int	is_dead(t_philo *philo)
 {
-	size_t	current_time;
-
-	current_time = get_current_time();
-
 	pthread_mutex_lock(&philo->env->death_mutex);
-	//if ((current_time - philo->last_dinner) > (size_t)philo->env->time_die) // misschien gaat hier iets niet goed
-	if (current_time > (philo->last_dinner + philo->env->time_die))
+	if (get_current_time() > (philo->last_dinner + philo->env->time_die))
 	{
 		philo->env->someone_died = 1;
-		//printf("\n%d DIED\n", philo->nbr);
-		//exit(1);
 		return (1);
 	}
 	pthread_mutex_unlock(&philo->env->death_mutex);
@@ -83,7 +74,6 @@ void	*philo_scanner(void *philo_object)
 			if (is_dead(philo))
 			{
 				printer(philo, 4);
-				//exit(1);
 				philo->env->someone_died = 1;
 				philo->env->continue_dinner = 0;
 				return (NULL);
@@ -92,18 +82,6 @@ void	*philo_scanner(void *philo_object)
 		}
 		// CHECK N TIMES EAT?
 	}
-	return (NULL);
-}
-
-void	*alive_scanner(void *philo_object)
-{
-	int i;
-	t_philo *philo;
-	
-	i = 0;
-	(void)i;
-	philo = (t_philo *)philo_object;
-	(void)philo;
 	return (NULL);
 }
 

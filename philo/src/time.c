@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/01 16:09:19 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/12 15:07:52 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/12 19:37:44 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,8 @@ size_t	get_current_time(void)
 	size_t	current_time;
 
 	gettimeofday(&tv, NULL);
-	current_time = (size_t)sec_to_millisec(tv.tv_sec) + microsec_to_millisec(tv.tv_usec);
+	current_time = (size_t)sec_to_millisec(tv.tv_sec) + \
+	microsec_to_millisec(tv.tv_usec);
 	return(current_time);
 }
 

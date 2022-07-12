@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/12 13:52:31 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/12 14:53:38 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/12 19:57:05 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,12 @@
 
 int	eating_process(t_philo *philo)
 {
-	//pthread_mutex_lock(philo->env->eating_mutex);
 	pthread_mutex_lock(philo->eating_mutex);
 	printer(philo, EAT);
-	philo->eating = 1;
 	sleep_for_duration(philo->env->time_eat);
-	philo->eating = 0;
-	philo->eat_counter++;
+	//philo->eat_counter++;
 	philo->last_dinner = get_current_time();
 	philo->time_to_die = philo->last_dinner + philo->env->time_die;
-	//printf("\n%d %lu\n\n", philo->nbr, philo->time_to_die);
 	pthread_mutex_unlock(philo->eating_mutex);
 	return (0);
 }
@@ -38,8 +34,6 @@ int	sleeping_process(t_philo *philo)
 int	thinking_process(t_philo *philo)
 {
 	printer(philo, THINK);
-	//usleep(1);
-	//exit(1);
 	return (0);
 }
 

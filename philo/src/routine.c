@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/12 13:45:19 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/12 14:52:45 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/12 19:59:30 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ void	*routine(void *philo_object)
 	philo->last_dinner = get_current_time();
 	while (1)
 	{
+		if (philo->eat_counter == philo->env->n_eat)
+			philo->done_eating = 1;
 		if (take_fork(philo))
 			return (NULL);
 		if (eating_process(philo))
