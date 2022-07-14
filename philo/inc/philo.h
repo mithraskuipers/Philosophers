@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/03 17:49:43 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/12 19:59:34 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/13 15:43:29 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ typedef struct s_env
 	int				time_eat;
 	int				time_sleep;
 	int				n_eat;
+	int				n_need_to_eat;
 	int				someone_died;
 	int				continue_dinner;
 	u_int64_t		first_dinner;
@@ -71,6 +72,10 @@ void	check_args(int argc, t_env *env);
 int		iswhitespace(int c);
 int		mk_atoi(char *s, int *nbr);
 
+/* tools.c */
+int		is_dead(t_philo *philo);
+void	msg_exit(char *s, int fd, int exit_code);
+
 /* time.c */
 size_t	sec_to_millisec(size_t sec);
 size_t	microsec_to_millisec(size_t microsec);
@@ -78,6 +83,7 @@ size_t	get_current_time(void);
 void	sleep_for_duration(size_t duration);
 
 /* init.c */
+void	init_env(t_env *env);
 int		init_philos(t_env *env, t_philo **philos);
 int		init_threads(t_env *env);
 
@@ -91,7 +97,9 @@ int	thinking_process(t_philo *philo);
 int	take_fork(t_philo *philo);
 int	return_fork(t_philo *philo);
 
-/* routine.c */
+/* threads.c */
 void	*routine(void *philo_object);
+void	*philo_scanner(void *philo_object);
+int		start_threads(t_env *env);
 
 # endif

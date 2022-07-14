@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/12 11:10:56 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/12 19:35:51 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/13 16:30:54 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,13 @@ void	printer(t_philo *philo, int	task_code)
 			printf("%zu %d is sleeping\n", time, philo->nbr + 1);
 		else if (task_code == 3)
 			printf("%zu %d is thinking\n", time, philo->nbr + 1);
+		pthread_mutex_unlock(&philo->env->print_mutex);
+		return ;
 	}
 	else if (philo->env->someone_died && task_code == 4)
 	{
 		printf("%zu %d died\n", time, philo->nbr + 1);
 		return ;
 	}
-	pthread_mutex_unlock(&philo->env->print_mutex);
 	return ;
 }

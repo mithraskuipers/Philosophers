@@ -6,7 +6,7 @@
 #    By: mikuiper <mikuiper@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/06/03 17:36:28 by mikuiper      #+#    #+#                  #
-#    Updated: 2022/07/12 13:53:03 by mikuiper      ########   odam.nl          #
+#    Updated: 2022/07/13 15:40:21 by mikuiper      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,7 @@ SRCS		=	$(SRC_DIR)main.c \
 				$(SRC_DIR)parse_input.c \
 				$(SRC_DIR)tasks.c \
 				$(SRC_DIR)printer.c \
-				$(SRC_DIR)routine.c
+				$(SRC_DIR)threads.c
 
 OBJS		= $(SRCS:.c=.o)
 

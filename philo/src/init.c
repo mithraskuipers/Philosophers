@@ -6,11 +6,20 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/12 08:52:17 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/12 19:59:43 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/13 18:28:17 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+void	init_env(t_env *env)
+{
+	env->someone_died = 0;
+	env->first_dinner = get_current_time();
+	env->continue_dinner = 1;
+	env->n_need_to_eat = env->n_philos;
+	return ;
+}
 
 int	init_philos(t_env *env, t_philo **philos)
 {
@@ -30,7 +39,6 @@ int	init_philos(t_env *env, t_philo **philos)
 		(*philos)[i].fork_right = (((*philos)[i].nbr + 1) % \
 		(*philos)[i].env->n_philos);
 		(*philos)[i].last_dinner = get_current_time();
-		(*philos)[i].time_to_die = (*philos)[i].last_dinner + env->time_die;
 		(*philos)[i].eating_mutex = malloc(sizeof(pthread_mutex_t) * 1);
 		i++;
 	}
@@ -45,8 +53,5 @@ int	init_threads(t_env *env)
 	env->life_threads = malloc(env->n_philos * sizeof(pthread_t));
 	if (!env->life_threads)
 		return (-1);
-	// env->death_check = malloc(sizeof(pthread_t) * 1);
-	// if (!env->death_check)
-	// 	return (-1);
 	return (0);
 }
