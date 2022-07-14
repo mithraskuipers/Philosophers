@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   check_input.c                                      :+:    :+:            */
+/*   parse_input.c                                      :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/12 08:45:39 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/12 08:50:09 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/14 09:48:36 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,9 @@ int	str_only_nbrs(char *s)
 void	check_input(int argc, char **argv)
 {
 	int	arg;
-	
+
+	if ((argc != 5) && (argc != 6))
+		msg_exit("Error: Please enter the required number of arguments.", 2, 1);
 	arg = (argc - 1);
 	while (arg)
 	{

@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/03 17:37:34 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/13 19:53:33 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/14 09:48:12 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,6 @@ int	main(int argc, char **argv)
 	env = ft_calloc(1, sizeof(t_env));
 	if (!env)
 		msg_exit("Error: env memory allocated failed.", 2, 1);
-	if ((argc != 5) && (argc != 6))
-		msg_exit("Error: Please enter the required number of arguments.", 2, 1);
 	check_input(argc, argv);
 	parse_input(argc, argv, env);
 	check_args(argc, env);
