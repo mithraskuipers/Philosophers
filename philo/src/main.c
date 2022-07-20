@@ -6,11 +6,15 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/03 17:37:34 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/14 09:48:12 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/19 22:14:20 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+/*
+(make re) ; (bash ../philosopher_tester/philo_tester.sh m)
+*/
 
 /*
 1: n philos
@@ -21,7 +25,6 @@
 */
 
 /*
-TOEVOEGEN EAT COUNTER CHECK
 memory leaks
 variable clean up
 accurate sleep function
@@ -47,6 +50,7 @@ int	create_mutexes(t_env *env)
 int	main(int argc, char **argv)
 {
 	t_env	*env;
+
 	env = ft_calloc(1, sizeof(t_env));
 	if (!env)
 		msg_exit("Error: env memory allocated failed.", 2, 1);
@@ -62,8 +66,12 @@ int	main(int argc, char **argv)
 		msg_exit("Error: Memory allocation for threads failed.", 2, 1);
 	if (start_threads(env) == -1)
 		msg_exit("Error. Could not create threads.", 2, 1);
-	while (env->continue_dinner || !env->someone_died)
-		continue;
+	//while (env->continue_dinner && env->everyone_alive)
+	while (env->continue_dinner)
+	{
+		usleep(200);
+		continue ;
+	}
 	return (0);
 }
 

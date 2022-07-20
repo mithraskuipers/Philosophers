@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/12 13:52:31 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/13 18:27:43 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/19 16:59:48 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@ int	eating_process(t_philo *philo)
 {
 	pthread_mutex_lock(philo->eating_mutex);
 	printer(philo, EAT);
-	sleep_for_duration(philo->env->time_eat);
 	philo->last_dinner = get_current_time();
+	sleep_for_duration(philo->env->time_eat);
 	philo->eat_counter++;
 	if (philo->done_eating == 0)
 	{
@@ -32,7 +32,7 @@ int	eating_process(t_philo *philo)
 }
 
 int	sleeping_process(t_philo *philo)
-{ 
+{
 	printer(philo, SLEEP);
 	sleep_for_duration(philo->env->time_sleep);
 	return (0);
@@ -46,16 +46,6 @@ int	thinking_process(t_philo *philo)
 
 int	take_fork(t_philo *philo)
 {
-	// if (philo->nbr % 2 == 0)
-	// {
-	// 	pthread_mutex_lock(&philo->env->forks[philo->fork_left]);
-	// 	pthread_mutex_lock(&philo->env->forks[philo->fork_right]);
-	// }
-	// else
-	// {
-	// 	pthread_mutex_lock(&philo->env->forks[philo->fork_right]);
-	// 	pthread_mutex_lock(&philo->env->forks[philo->fork_left]);
-	// }
 	pthread_mutex_lock(&philo->env->forks[philo->fork_left]);
 	pthread_mutex_lock(&philo->env->forks[philo->fork_right]);
 	printer(philo, FORK);
@@ -67,15 +57,5 @@ int	return_fork(t_philo *philo)
 {
 	pthread_mutex_unlock(&philo->env->forks[philo->fork_left]);
 	pthread_mutex_unlock(&philo->env->forks[philo->fork_right]);
-	// if (philo->nbr % 2 == 0)
-	// {
-	// 	pthread_mutex_unlock(&philo->env->forks[philo->fork_left]);
-	// 	pthread_mutex_unlock(&philo->env->forks[philo->fork_right]);
-	// }
-	// else
-	// {
-	// 	pthread_mutex_unlock(&philo->env->forks[philo->fork_right]);
-	// 	pthread_mutex_unlock(&philo->env->forks[philo->fork_left]);
-	// }
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/12 08:45:39 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/14 09:48:36 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/19 20:40:51 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,5 +78,7 @@ void	check_args(int argc, t_env *env)
 	if (env->time_sleep < 0)
 		msg_exit("Error: Wrong time to sleep.", 2, 1);
 	if (argc == 6 && env->n_eat <= 0)
-		msg_exit("Error: Wrong number of times everyone should eat.", 2, 1);
+		exit(1);
+	// if (argc == 6 && env->n_eat <= 0)
+	// 	msg_exit("Error: Wrong number of times everyone should eat.", 2, 1);
 }

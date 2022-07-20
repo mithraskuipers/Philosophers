@@ -6,39 +6,37 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/03 17:49:43 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/13 15:43:29 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/19 22:14:06 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
 
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-
+# include <unistd.h>
+# include <stdlib.h>
+# include <stdio.h>
 # include <pthread.h>
 # include <sys/time.h>
 
-#define INTMAX 2147483647
-#define INTMIN -2147483648
-
-#define FORK 0
-#define EAT 1
-#define SLEEP 2
-#define THINK 3
-#define DIED 4
+# define INTMAX 2147483647
+# define INTMIN -2147483648
+# define FORK 0
+# define EAT 1
+# define SLEEP 2
+# define THINK 3
+# define DIED 4
 
 typedef struct s_philo
 {
-	int		nbr;
-	size_t	last_dinner;
-	size_t	time_to_die;
-	int		eat_counter;
-	int		fork_left;
-	int		fork_right;
-	int		done_eating;
-	pthread_mutex_t *eating_mutex;
+	int				nbr;
+	size_t			last_dinner;
+	size_t			time_to_die;
+	int				eat_counter;
+	int				fork_left;
+	int				fork_right;
+	int				done_eating;
+	pthread_mutex_t	*eating_mutex;
 	struct s_env	*env;
 }				t_philo;
 
@@ -50,7 +48,7 @@ typedef struct s_env
 	int				time_sleep;
 	int				n_eat;
 	int				n_need_to_eat;
-	int				someone_died;
+	//int				everyone_alive;
 	int				continue_dinner;
 	u_int64_t		first_dinner;
 	pthread_t		*philo_threads;
@@ -88,18 +86,18 @@ int		init_philos(t_env *env, t_philo **philos);
 int		init_threads(t_env *env);
 
 /* printer.c */
-void	printer(t_philo *philo, int	task_code);
+void	printer(t_philo *philo, int task_code);
 
 /* tasks.c */
-int	eating_process(t_philo *philo);
-int	sleeping_process(t_philo *philo);
-int	thinking_process(t_philo *philo);
-int	take_fork(t_philo *philo);
-int	return_fork(t_philo *philo);
+int		eating_process(t_philo *philo);
+int		sleeping_process(t_philo *philo);
+int		thinking_process(t_philo *philo);
+int		take_fork(t_philo *philo);
+int		return_fork(t_philo *philo);
 
 /* threads.c */
 void	*routine(void *philo_object);
 void	*philo_scanner(void *philo_object);
 int		start_threads(t_env *env);
 
-# endif
+#endif

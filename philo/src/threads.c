@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/12 13:45:19 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/13 19:20:36 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/19 22:14:58 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	*routine(void *philo_object)
 {
-	t_philo *philo;
+	t_philo	*philo;
 
 	philo = (t_philo *)philo_object;
 	philo->last_dinner = get_current_time();
@@ -36,13 +36,29 @@ void	*routine(void *philo_object)
 	return (NULL);
 }
 
+void	clear_data(t_env *env)
+{
+	int	i;
+
+	i = 0;
+	pthread_mutex_destroy(env->forks);
+	pthread_mutex_destroy(&env->death_mutex);
+	pthread_mutex_destroy(&env->print_mutex);
+	while (i < env->n_philos)
+	{
+		pthread_mutex_destroy(env->philos[i].eating_mutex);
+		i++;
+	}
+}
+
 void	*philo_scanner(void *philo_object)
 {
-	int i;
-	t_philo *philo;
+	int		i;
+	t_philo	*philo;
 
 	philo = (t_philo *)philo_object;
-	while (philo->env->continue_dinner && !philo->env->someone_died)
+	// while (philo->env->continue_dinner && philo->env->everyone_alive)
+	while (philo->env->continue_dinner)
 	{
 		if (philo->env->n_need_to_eat == 0)
 			philo->env->continue_dinner = 0;
@@ -51,9 +67,10 @@ void	*philo_scanner(void *philo_object)
 		{
 			if (is_dead(philo))
 			{
-				printer(philo, 4);
-				philo->env->someone_died = 1;
+				// philo->env->everyone_alive = 0;
 				philo->env->continue_dinner = 0;
+				printer(philo, 4);
+				clear_data(philo->env);
 				return (NULL);
 			}
 			i++;
@@ -64,9 +81,10 @@ void	*philo_scanner(void *philo_object)
 
 int	start_threads(t_env *env)
 {
-	int		i;
-	int		routine_status;
-	int		philo_status;
+	int	i;
+	int	routine_status;
+	int	philo_status;
+
 	i = 0;
 	while (i < env->n_philos)
 	{
@@ -74,9 +92,8 @@ int	start_threads(t_env *env)
 		routine_status = pthread_create(&env->philo_threads[i], NULL, routine, \
 		&env->philos[i]);
 		if (routine_status != 0)
-			return (routine_status); 
+			return (routine_status);
 		i++;
-		//usleep(100);
 	}
 	i = 0;
 	while (i < env->n_philos)
@@ -84,9 +101,8 @@ int	start_threads(t_env *env)
 		philo_status = pthread_create(&env->life_threads[i], NULL, \
 		philo_scanner, &env->philos[i]);
 		if (philo_status != 0)
-			return (philo_status); 
+			return (philo_status);
 		i++;
-		//usleep(100);
 	}
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: mikuiper <mikuiper@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/12 08:52:17 by mikuiper      #+#    #+#                 */
-/*   Updated: 2022/07/13 18:28:17 by mikuiper      ########   odam.nl         */
+/*   Updated: 2022/07/19 22:14:00 by mikuiper      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	init_env(t_env *env)
 {
-	env->someone_died = 0;
+	//env->everyone_alive = 1;
 	env->first_dinner = get_current_time();
 	env->continue_dinner = 1;
 	env->n_need_to_eat = env->n_philos;
@@ -29,7 +29,7 @@ int	init_philos(t_env *env, t_philo **philos)
 	*philos = malloc(env->n_philos * sizeof(t_philo));
 	if (!philos)
 		return (-1);
-	while(i < env->n_philos)
+	while (i < env->n_philos)
 	{
 		(*philos)[i].nbr = i;
 		(*philos)[i].eat_counter = 0;
